@@ -1,11 +1,19 @@
+import React, { useState } from 'react'; // Importação essencial
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home/Home';
-import './styles/global.css'; // Onde está o seu reset de margem/padding
+import Login from './pages/Login/Login';
+import './index.css';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
-    <div className="App">
-      <Home />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
+        <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+      </Routes>
+    </Router>
   );
 }
 

@@ -11,7 +11,7 @@ import alumniData from '../../data/alumni.json';
 // Estilos
 import styles from './Home.module.css';
 
-const Home = () => {
+const Home = ({ isLoggedIn }) => {
   // --- ESTADOS ---
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCurso, setSelectedCurso] = useState('');
@@ -49,7 +49,10 @@ const Home = () => {
   return (
     <div className={styles.wrapper}>
       {/* 1. Cabeçalho com botão de ação */}
-      <Header onAddClick={handleAddProfile} />
+      <Header
+        isLoggedIn={isLoggedIn}
+        onAddClick={() => setIsAddModalOpen(true)}
+      />
 
       <main className={styles.container}>
         {/* 2. Barra de Busca e Filtros Dinâmicos */}
@@ -73,14 +76,16 @@ const Home = () => {
         <section className={styles.cardsGrid}>
           {filteredAlumni.length > 0 ? (
             filteredAlumni.map((alumnus) => (
-              <AlumniCard
-                key={alumnus.id}
-                data={alumnus}
-                onClick={handleOpenModal}
-              />
+              <AlumniCard key={alumnus.id} data={alumnus} onClick={handleOpenModal} />
             ))
           ) : (
-            <p className={styles.noResults}>Nenhum ex-aluno encontrado com esses filtros.</p>
+            <div className={styles.emptyState}>
+              <Search size={48} />
+              <p>Nenhum ex-aluno encontrado com esses filtros.</p>
+              <button onClick={() => { setSearchTerm(''); setSelectedCurso(''); setSelectedAno(''); }}>
+                Limpar Filtros
+              </button>
+            </div>
           )}
         </section>
       </main>
