@@ -1,0 +1,33 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  width: 95%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 2rem 0;
+  flex: 1; /* Faz o conteúdo crescer para empurrar o footer */
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.resultsInfo {
+  color: #e9ebf7;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.noResults {
+  color: #fff;
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  opacity: 0.7;
+}
