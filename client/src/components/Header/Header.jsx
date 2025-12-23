@@ -11,6 +11,8 @@ const Header = ({ onAddClick, isLoggedIn, setIsLoggedIn }) => { // Receba o setI
     navigate('/');
   };
 
+
+
   return (
     <header className={styles.header}>
       <div className={styles.headerContent}>

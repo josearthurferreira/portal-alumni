@@ -5,6 +5,7 @@ import AlumniCard from '../../components/AlumniCard/AlumniCard';
 import Modal from '../../components/Modal/Modal';
 import Footer from '../../components/Footer/Footer';
 import AddAlumniModal from '../../components/AddAlumniModal/AddAlumniModal'; // Modal de cadastro de ex-aluno
+import { Search, Filter, Plus, RotateCcw } from 'lucide-react';
 
 // Dados mockados
 import alumniData from '../../data/alumni.json';
@@ -12,7 +13,10 @@ import alumniData from '../../data/alumni.json';
 // Estilos
 import styles from './Home.module.css';
 
-const Home = ({ isLoggedIn }) => {
+const Home = ({ isLoggedIn, setIsLoggedIn }) => {
+
+  const [alumni, setAlumni] = useState(alumniData);
+
   // --- ESTADOS ---
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCurso, setSelectedCurso] = useState('');
@@ -29,14 +33,11 @@ const Home = ({ isLoggedIn }) => {
   );
 
   // Filtra a lista principal com base nos 3 critérios simultâneos
-  const filteredAlumni = alumniData.filter((alumnus) => {
-    const matchesName = alumnus.nome
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCurso =
-      selectedCurso === '' || alumnus.curso === selectedCurso;
-    const matchesAno = selectedAno === '' || alumnus.ano === selectedAno;
-    return matchesName && matchesCurso && matchesAno;
+  const filteredAlumni = alumni.filter((alumnus) => {
+    const matchesSearch = alumnus.nome.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCurso = selectedCurso === "" || alumnus.curso === selectedCurso;
+    const matchesAno = selectedAno === "" || String(alumnus.ano) === String(selectedAno);
+    return matchesSearch && matchesCurso && matchesAno;
   });
 
   // --- HANDLERS ---
@@ -51,18 +52,15 @@ const Home = ({ isLoggedIn }) => {
 
   const handleAddProfile = () => {
     setIsAddModalOpen(true);
-    // Abre o modal de cadastro.
     // O Header chama esse handler via prop (onAddClick) quando o usuário clica em "Adicionar Perfil".
   };
 
   return (
     <div className={styles.wrapper}>
-      {/* 1. Cabeçalho com botão de ação */}
       <Header
         isLoggedIn={isLoggedIn}
-        onAddClick={handleAddProfile}
-        // Callback que o Header dispara ao clicar em "Adicionar Perfil".
-        // Mantive esse controle no Home para centralizar o estado do modal.
+        setIsLoggedIn={setIsLoggedIn}
+        onAddClick={() => setIsAddModalOpen(true)}
       />
 
       <main className={styles.container}>
@@ -84,32 +82,7 @@ const Home = ({ isLoggedIn }) => {
           {alumniData.length} ex-alunos
         </p>
 
-        {/* 4. Grid de Cards */}
-        <section className={styles.cardsGrid}>
-          {filteredAlumni.length > 0 ? (
-            filteredAlumni.map((alumnus) => (
-              <AlumniCard
-                key={alumnus.id}
-                data={alumnus}
-                onClick={handleOpenModal}
-              />
-            ))
-          ) : (
-            <div className={styles.emptyState}>
-              <Search size={48} />
-              <p>Nenhum ex-aluno encontrado com esses filtros.</p>
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCurso('');
-                  setSelectedAno('');
-                }}
-              >
-                Limpar Filtros
-              </button>
-            </div>
-          )}
-        </section>
+        {/* 4. Grid de Cards - APENAS UM BLOCO AQUI */}
         {filteredAlumni.length > 0 ? (
           <section className={styles.cardsGrid}>
             {filteredAlumni.map((alumnus) => (
@@ -122,7 +95,9 @@ const Home = ({ isLoggedIn }) => {
           </section>
         ) : (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>🔍</div>
+            <div className={styles.emptyIcon}>
+              <Search size={48} color="#cc4b00" />
+            </div>
             <h2>Nenhum resultado encontrado</h2>
             <p>Não encontramos nenhum ex-aluno que corresponda aos filtros selecionados.</p>
             <button
