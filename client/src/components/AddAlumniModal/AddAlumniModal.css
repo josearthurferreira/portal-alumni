@@ -1,0 +1,360 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 50;
+}
+
+.modal {
+  width: min(920px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid #e7e7e7;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.closeButton {
+  border: 0;
+  background: transparent;
+  font-size: 26px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.closeButton:hover {
+  background: #f3f3f3;
+}
+
+.form {
+  padding: 18px 22px 22px;
+}
+
+.photoSection {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.photoCircle {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  border: 2px dashed #d7d7d7;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.photoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photoIcon {
+  font-size: 22px;
+  opacity: 0.7;
+}
+
+.photoLabel {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.photoActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.fileInput {
+  display: none;
+}
+
+.photoButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #d7d7d7;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.photoButton:hover {
+  background: #f7f7f7;
+}
+
+.photoHint {
+  font-size: 12px;
+  color: #666;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #111;
+}
+
+.required {
+  color: #d13b3b;
+  font-weight: 700;
+}
+
+.control input,
+.control select,
+.control textarea {
+  width: 100%;
+  border: 1px solid #d7d7d7;
+  border-radius: 8px;
+  padding: 11px 12px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+}
+
+.control textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.control input:focus,
+.control select:focus,
+.control textarea:focus {
+  border-color: #c8c8c8;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.errorText {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #d13b3b;
+}
+
+.linkedinWrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d7d7d7;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.linkedinPrefix {
+  padding: 11px 12px;
+  background: #f3f3f3;
+  font-size: 13px;
+  color: #333;
+  border-right: 1px solid #d7d7d7;
+  white-space: nowrap;
+}
+
+.linkedinInput {
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #e7e7e7;
+}
+
+.cancelButton {
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #d7d7d7;
+  background: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  min-width: 160px;
+}
+
+.cancelButton:hover {
+  background: #f7f7f7;
+}
+
+.submitButton {
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 0;
+  background: #f27a1a;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  min-width: 220px;
+}
+
+.submitButton:disabled,
+.cancelButton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 780px) {
+  .photoSection {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer {
+    flex-direction: column;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+  }
+}
+/* Linha do input de data + botão 📅 */
+.dateRow {
+  display: grid;
+  grid-template-columns: 1fr 46px;
+  gap: 10px;
+  align-items: center;
+}
+
+.calendarBtn {
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #d7d7d7;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.calendarBtn:hover {
+  background: #f7f7f7;
+}
+
+/* input date escondido (só serve pra abrir o calendário) */
+.hiddenDate {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+/* só mostra erro depois de tentar enviar */
+.validated .control input:required:invalid,
+.validated .control select:required:invalid,
+.validated .control textarea:required:invalid {
+  border-color: #f27a1a;
+  box-shadow: 0 0 0 3px rgba(242, 122, 26, 0.18);
+}
+
+/* Wrapper do email com ícone à direita */
+.emailWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.emailWrap input {
+  padding-right: 38px; /* espaço pro ícone */
+}
+
+.emailIcon {
+  position: absolute;
+  right: 12px;
+  font-weight: 900;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Estado: inválido */
+.email-invalid input {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+.email-invalid .emailIcon {
+  color: #ef4444;
+}
+.emailMsg.email-invalid {
+  color: #ef4444;
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+
+/* Estado: domínio incomum */
+.email-uncommon input {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+}
+.email-uncommon .emailIcon {
+  color: #f59e0b;
+}
+.emailMsg.email-uncommon {
+  color: #0f172a;
+  margin: 6px 0 0;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* Estado: válido */
+.email-valid input {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+}
+.email-valid .emailIcon {
+  color: #22c55e;
+}
+.emailMsg.email-valid {
+  color: #22c55e;
+  margin: 6px 0 0;
+  font-size: 12px;
+}
