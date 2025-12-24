@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
 
-export function useIbgeLocations(isOpen, stateUf) {
+export function useIbgeLocations(isOpen, stateUf, enabled = true) {
   const [ufs, setUfs] = useState([]);
   const [cities, setCities] = useState([]);
   const [loadingUfs, setLoadingUfs] = useState(false);
   const [loadingCities, setLoadingCities] = useState(false);
 
-  // Carrega UFs ao abrir
+  // Carrega UFs (IBGE) ao abrir (somente se enabled)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !enabled) {
+      setUfs([]);
+      setLoadingUfs(false);
+      return;
+    }
 
     let cancelled = false;
     const ctrl = new AbortController();
@@ -30,17 +34,23 @@ export function useIbgeLocations(isOpen, stateUf) {
     }
 
     loadUfs();
+
     return () => {
       cancelled = true;
       ctrl.abort();
     };
-  }, [isOpen]);
+  }, [isOpen, enabled]);
 
-  // Carrega cidades quando UF muda
+  // UF mudou -> busca municípios daquela UF (somente se enabled)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !enabled) {
+      setCities([]);
+      setLoadingCities(false);
+      return;
+    }
 
     setCities([]);
+
     if (!stateUf || !ufs.length) return;
 
     const ufObj = ufs.find((u) => u.sigla === stateUf);
@@ -71,11 +81,12 @@ export function useIbgeLocations(isOpen, stateUf) {
     }
 
     loadCities();
+
     return () => {
       cancelled = true;
       ctrl.abort();
     };
-  }, [isOpen, stateUf, ufs]);
+  }, [isOpen, enabled, stateUf, ufs]);
 
   return { ufs, cities, loadingUfs, loadingCities };
 }

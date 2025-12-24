@@ -50,11 +50,6 @@ export function applyPtBrValidityMessage(el) {
     return;
   }
 
-  if (el.validity.typeMismatch && el.type === 'email') {
-    el.setCustomValidity('Digite um email válido.');
-    return;
-  }
-
   if (el.validity.patternMismatch) {
     if (el.name === 'graduationYear') {
       el.setCustomValidity('Digite um ano válido com 4 dígitos (ex: 2020).');
@@ -68,41 +63,7 @@ export function applyPtBrValidityMessage(el) {
   }
 }
 
-const COMMON_EMAIL_DOMAINS = new Set([
-  'gmail.com',
-  'hotmail.com',
-  'outlook.com',
-  'live.com',
-  'yahoo.com',
-  'icloud.com',
-  'proton.me',
-  'protonmail.com',
-  'uol.com.br',
-  'bol.com.br',
-  'ig.com.br',
-  'terra.com.br',
-]);
-
-export function getEmailStatus(valueRaw = '') {
-  const value = valueRaw.trim().toLowerCase();
-  if (!value) return { status: 'empty', message: '' };
-
-  const basicOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  if (!basicOk)
-    return { status: 'invalid', message: 'Formato de email inválido' };
-
-  const domain = value.split('@')[1] || '';
-  if (COMMON_EMAIL_DOMAINS.has(domain)) {
-    return { status: 'valid', message: 'Email válido' };
-  }
-
-  return {
-    status: 'uncommon',
-    message: 'Domínio não comum, verifique se está correcto',
-  };
-}
-
-/** Coloquei aqui um limite de 110 anos */
+/** Regra: nascimento entre hoje e (hoje - maxYears) */
 function toLocalIso(d) {
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -129,10 +90,10 @@ export function validateBirthDate(br, minIso, maxIso) {
   if (!v) return '';
 
   const iso = brToIso(v);
-  if (!iso) return 'Use dd/mm/aaaa e uma data real.';
+  if (!iso) return 'Use uma data real.';
 
-  if (iso < minIso) return `Certeza que colocou a data certa?`;
-  if (iso > maxIso) return `Data não pode ser no futuro.`;
+  if (iso < minIso) return 'Tem certeza que digitou certo?';
+  if (iso > maxIso) return 'Tem certeza que digitou certo?';
 
   return '';
 }
