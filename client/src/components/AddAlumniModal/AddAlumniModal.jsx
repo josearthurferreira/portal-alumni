@@ -343,7 +343,6 @@ export default function AddAlumniModal({
           <section className="grid">
             <Field
               label="Nome Completo"
-              required
               input={
                 <input
                   name="fullName"
@@ -351,7 +350,6 @@ export default function AddAlumniModal({
                   readOnly
                   aria-readonly="true"
                   className="readonly"
-                  required
                 />
               }
             />
@@ -369,7 +367,6 @@ export default function AddAlumniModal({
                 />
               }
             />
-
             <Field
               label="Como prefere ser chamado"
               input={
@@ -381,7 +378,6 @@ export default function AddAlumniModal({
                 />
               }
             />
-
             <Field
               label="Data de Aniversário"
               error={extraErrors.birthDate}
@@ -437,7 +433,6 @@ export default function AddAlumniModal({
                 </div>
               }
             />
-
             <Field
               label="Curso"
               required
@@ -459,7 +454,6 @@ export default function AddAlumniModal({
                 </select>
               }
             />
-
             <Field
               label="Ano de Formatura"
               required
@@ -495,7 +489,6 @@ export default function AddAlumniModal({
                 />
               }
             />
-
             {/* País -> Estado -> Cidade */}
             <Field
               label="País"
@@ -518,7 +511,6 @@ export default function AddAlumniModal({
                 </select>
               }
             />
-
             <Field
               label="Estado"
               required
@@ -548,7 +540,6 @@ export default function AddAlumniModal({
                 </select>
               }
             />
-
             <Field
               label="Cidade"
               required
@@ -578,7 +569,6 @@ export default function AddAlumniModal({
                 </select>
               }
             />
-
             <Field
               label="Empresa/Instituição"
               input={
@@ -590,7 +580,6 @@ export default function AddAlumniModal({
                 />
               }
             />
-
             <Field
               label="Cargo/Posição"
               input={
@@ -612,7 +601,6 @@ export default function AddAlumniModal({
                 </select>
               }
             />
-
             <Field
               label="Telefone (Nacional/Internacional)"
               hint="Opcional. Se internacional, inclua o DDI (+55, +1...)."
@@ -635,7 +623,6 @@ export default function AddAlumniModal({
                 />
               }
             />
-
             <Field
               label="LinkedIn (nome de usuário)"
               fullWidth
@@ -652,7 +639,6 @@ export default function AddAlumniModal({
                 </div>
               }
             />
-
             <Field
               label="Biografia"
               fullWidth
