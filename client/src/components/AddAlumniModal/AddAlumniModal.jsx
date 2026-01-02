@@ -488,6 +488,7 @@ export default function AddAlumniModal({
                     ref={birthInputRef}
                     name="birthDate"
                     value={form.birthDate}
+                    required
                     onChange={(e) =>
                       setField('birthDate', normalizeBrDate(e.target.value))
                     }
@@ -632,8 +633,8 @@ export default function AddAlumniModal({
                         {!form.countryIso2
                           ? 'Primeiro selecione o país'
                           : loadingStates
-                          ? 'Carregando estados...'
-                          : 'Selecione o estado'}
+                            ? 'Carregando estados...'
+                            : 'Selecione o estado'}
                       </option>
 
                       {states.map((s) => (
@@ -666,10 +667,10 @@ export default function AddAlumniModal({
                           {!form.countryIso2
                             ? 'Selecione o país'
                             : !form.stateUf
-                            ? 'Selecione o estado'
-                            : loadingCities
-                            ? 'Carregando cidades...'
-                            : 'Selecione a cidade'}
+                              ? 'Selecione o estado'
+                              : loadingCities
+                                ? 'Carregando cidades...'
+                                : 'Selecione a cidade'}
                         </option>
 
                         {cities.map((city) => (

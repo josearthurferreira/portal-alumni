@@ -50,24 +50,25 @@
 
 .socialIcons {
   display: flex;
-  gap: 1rem;
+  gap: 12px;
+  margin-bottom: 15px;
 }
 
 .iconCircle {
-  background-color: #ffffff;
-  color: #0d1425; /* Cor do fundo dentro do ícone */
-  width: 40px;
-  height: 40px;
+  background-color: white;
+  width: 38px; /* Tamanho do círculo */
+  height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.2s;
+  color: #0a192f; /* Cor azul marinho do fundo */
+  transition: all 0.2s ease-in-out;
 }
 
 .iconCircle:hover {
-  opacity: 0.8;
-  transform: scale(1.1);
+  transform: translateY(-2px);
+  background-color: #f0f0f0;
 }
 
 .legalLink {

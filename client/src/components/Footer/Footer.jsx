@@ -22,10 +22,21 @@ const Footer = () => {
         {/* Lado Direito: Social e Links */}
         <div className={styles.rightSection}>
           <div className={styles.socialIcons}>
-            <a href="https://www.linkedin.com/company/alumniime" className={styles.iconCircle}><Linkedin size={20} fill="currentColor" /></a>
-            <a href="https://www.facebook.com/AlumniIME" className={styles.iconCircle}><Facebook size={20} fill="currentColor" /></a>
-            <a href="https://www.youtube.com/c/AlumniIME/featured" className={styles.iconCircle}><Youtube size={20} fill="currentColor" /></a>
-            <a href="https://www.instagram.com/alumniime/" className={styles.iconCircle}><Instagram size={20} /></a>
+            <a href="https://www.linkedin.com/company/alumniime" className={styles.iconCircle}>
+              {/* LinkedIn e Facebook ficam bons com fill para parecerem sólidos */}
+              <Linkedin size={20} fill="currentColor" strokeWidth={0} />
+            </a>
+            <a href="https://www.facebook.com/AlumniIME" className={styles.iconCircle}>
+              <Facebook size={20} fill="currentColor" strokeWidth={0} />
+            </a>
+            <a href="https://www.youtube.com/c/AlumniIME/featured" className={styles.iconCircle}>
+              {/* YouTube: SEM fill e com strokeWidth maior para aparecer o triângulo */}
+              <Youtube size={20} strokeWidth={2.5} />
+            </a>
+            <a href="https://www.instagram.com/alumniime/" className={styles.iconCircle}>
+              {/* Instagram: Segue o padrão de traço mais grosso */}
+              <Instagram size={20} strokeWidth={2.5} />
+            </a>
           </div>
 
           <a href="https://alumniime.com.br/politica-de-privacidade" className={styles.legalLink}>
