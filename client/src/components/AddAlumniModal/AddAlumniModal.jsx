@@ -441,6 +441,7 @@ export default function AddAlumniModal({
 
             <Field
               label="Data de Aniversário"
+              required
               error={extraErrors.birthDate}
               input={
                 <div className="dateRow">
