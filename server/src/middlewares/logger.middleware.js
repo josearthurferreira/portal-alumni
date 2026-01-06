@@ -1,2 +1,13 @@
-// [Programador F]: Implementar log de requisições e capturador de erros global
-// Ref:
+// src/middlewares/logger.middleware.js
+function logger(req, res, next) {
+  const start = Date.now();
+  res.on('finish', () => {
+    const ms = Date.now() - start;
+    console.log(
+      `${req.method} ${req.originalUrl} -> ${res.statusCode} (${ms}ms)`,
+    );
+  });
+  next();
+}
+
+module.exports = { logger };

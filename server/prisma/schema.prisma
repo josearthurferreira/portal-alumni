@@ -1,28 +1,57 @@
-// Configuração do Cliente Prisma
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
 
-// Conexão com o banco de dados (PostgreSQL no Supabase)
+// DEV NOTE:
+// - Para rodar local rapidamente, usam SQLite (file:./dev.db).
+// - Para voltar ao Supabase (PostgreSQL), trocar provider para "postgresql" e usar DATABASE_URL no .env.
+// - Migrations de SQLite não são compatíveis com Postgres → é necessário recriar `prisma/migrations/`.
+
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
-// Modelo de Aluno (Alumnus)
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
 model Alumnus {
-  id              String   @id @default(uuid())
-  name            String
-  email           String   @unique
-  password        String
-  profilePicture  String?  // Preparado para o futuro sistema de fotos
-  country         String
-  state           String?
-  city            String?
-  course          String
-  graduationYear  Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                String   @id @default(cuid())
+
+  fullName          String   @map("full_name")
+  preferredName     String?  @map("preferred_name")
+
+  email             String   @unique
+  password          String?  // futuro (auth)
+
+  profilePicture    String?  @map("profile_picture") // por enquanto: URL
+
+  birthDate         DateTime @map("birth_date")
+
+  course            String
+  graduationYear    Int      @map("graduation_year")
+
+  country           String
+  state             String?
+  city              String?
+
+  addressComplement String?  @map("address_complement")
+
+  company           String?  @map("company")
+  role              String?  @map("role")
+
+  phone             String   @map("phone")
+  linkedinUsername  String?  @map("linkedin_username")
+
+  bio               String?  @map("bio")
+  skills            String?  @map("skills") // SQLite: JSON string (ex: ["Python","Power BI"])
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   @@map("alumni")
 }
