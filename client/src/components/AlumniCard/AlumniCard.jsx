@@ -6,11 +6,11 @@ const AlumniCard = ({ data, onClick }) => {
   return (
     <div className={styles.card} onClick={() => onClick(data)}>
       <img src={data.foto} alt={data.nome} className={styles.profilePic} />
-      <h3>{data.nome}</h3>
-      <p><GraduationCap size={16} /> {data.curso}</p>
-      <p><Calendar size={16} /> Turma de {data.ano}</p>
-      <p><MapPin size={16} /> {data.cidade}, {data.estado}</p>
-      <p><Building size={16} /> {data.empresa}</p>
+      <h3>{data.fullName}</h3>
+      <p><GraduationCap size={16} /> {data.course}</p>
+      <p><Calendar size={16} /> Turma de {data.graduationYear}</p>
+      <p><MapPin size={16} /> {data.city}, {data.state}</p>
+      <p><Building size={16} /> {data.company || 'Autônomo'}</p>
 
       <div className={styles.icons}>
         <button title="Email"><Mail size={18} /></button>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header/Header';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import AlumniCard from '../../components/AlumniCard/AlumniCard';
@@ -6,16 +6,16 @@ import Modal from '../../components/Modal/Modal';
 import Footer from '../../components/Footer/Footer';
 import AddAlumniModal from '../../components/AddAlumniModal/AddAlumniModal'; // Modal de cadastro de ex-aluno
 import { Search, Filter, Plus, RotateCcw } from 'lucide-react';
+import { getAlumni } from '../../services/api';
 
-// Dados mockados
-import alumniData from '../../data/alumni.json';
 
 // Estilos
 import styles from './Home.module.css';
 
 const Home = ({ isLoggedIn, setIsLoggedIn }) => {
 
-  const [alumni, setAlumni] = useState(alumniData);
+  const [alumni, setAlumni] = useState([]); // Começa vazio
+  const [loading, setLoading] = useState(true);
 
   // --- ESTADOS ---
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,21 +24,34 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
   const [selectedAlumni, setSelectedAlumni] = useState(null); // Controla o Modal
   const [isAddModalOpen, setIsAddModalOpen] = useState(false); //controla o Modal de adcionar um novo ex aluno
 
+  useEffect(() => {
+    getAlumni()
+      .then(response => {
+        setAlumni(response.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Erro ao carregar alumni:", err);
+        setLoading(false);
+      });
+  }, []);
+
   // --- LÓGICA DE DADOS ---
 
-  // Gera listas únicas para os selects da SearchBar automaticamente
-  const cursosUnicos = [...new Set(alumniData.map((a) => a.curso))].sort();
-  const anosUnicos = [...new Set(alumniData.map((a) => a.ano))].sort(
-    (a, b) => b - a,
-  );
 
   // Filtra a lista principal com base nos 3 critérios simultâneos
   const filteredAlumni = alumni.filter((alumnus) => {
-    const matchesSearch = alumnus.nome.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCurso = selectedCurso === "" || alumnus.curso === selectedCurso;
-    const matchesAno = selectedAno === "" || String(alumnus.ano) === String(selectedAno);
+    const matchesSearch = alumnus.fullName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCurso = selectedCurso === "" || alumnus.course === selectedCurso;
+    const matchesAno = selectedAno === "" || String(alumnus.graduationYear) === String(selectedAno);
     return matchesSearch && matchesCurso && matchesAno;
   });
+
+  // Gera listas para os filtros baseadas nos dados REAIS
+  const cursosUnicos = [...new Set(alumni.map((a) => a.course))].sort();
+  const anosUnicos = [...new Set(alumni.map((a) => a.graduationYear))].sort((a, b) => b - a);
+
+  if (loading) return <div>Carregando ex-alunos...</div>;
 
   // --- HANDLERS ---
 
@@ -79,7 +92,7 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
         {/* 3. Contador de Resultados */}
         <p className={styles.resultsInfo}>
           Mostrando <strong>{filteredAlumni.length}</strong> de{' '}
-          {alumniData.length} ex-alunos
+          {alumni.length} ex-alunos
         </p>
 
         {/* 4. Grid de Cards - APENAS UM BLOCO AQUI */}
