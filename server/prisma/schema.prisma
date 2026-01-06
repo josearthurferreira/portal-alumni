@@ -34,8 +34,9 @@ model Alumnus {
   graduationYear Int      @map("graduation_year")
   company        String?
   role           String?
+  yearsOfExperience Int?   @map("years_of_experience")
   linkedinUrl    String?  @map("linkedin_url")
-  skills         String?  // Armazenado como string/tags para compatibilidade simples
+  skills         String[]  // Armazenado como string/tags para compatibilidade simples
 
   // Metadados
   createdAt      DateTime @default(now()) @map("created_at")
