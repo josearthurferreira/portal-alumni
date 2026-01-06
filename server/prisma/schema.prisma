@@ -1,28 +1,45 @@
-// Configuração do Cliente Prisma
+// Configuração do Cliente
 generator client {
   provider = "prisma-client-js"
 }
 
-// Conexão com o banco de dados (PostgreSQL no Supabase)
+// Conexão Oficial - SEMPRE PostgreSQL para produção e Supabase
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// Modelo de Aluno (Alumnus)
 model Alumnus {
-  id              String   @id @default(uuid())
-  name            String
-  email           String   @unique
-  password        String
-  profilePicture  String?  // Preparado para o futuro sistema de fotos
-  country         String
-  state           String?
-  city            String?
-  course          String
-  graduationYear  Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  // Usamos UUID que é o padrão nativo do PostgreSQL para IDs únicos
+  id             String   @id @default(uuid())
+
+  // Informações Pessoais
+  fullName       String   @map("full_name")
+  preferredName  String?  @map("preferred_name")
+  email          String   @unique
+  password       String?  // Opcional até implementarmos o Auth
+  phone          String
+  birthDate      DateTime @map("birth_date")
+  profilePicture String?  @map("profile_picture")
+  bio            String?  @db.Text
+
+  // Localização
+  country        String
+  state          String?
+  city           String?
+  addressComp    String?  @map("address_complement")
+
+  // Carreira e Formação
+  course         String
+  graduationYear Int      @map("graduation_year")
+  company        String?
+  role           String?
+  linkedinUrl    String?  @map("linkedin_url")
+  skills         String?  // Armazenado como string/tags para compatibilidade simples
+
+  // Metadados
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   @@map("alumni")
 }

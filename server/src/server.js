@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const alumniRoutes = require('./routes/alumni.routes');
+const { errorMiddleware } = require('./middlewares/error.middleware');
+const { logger } = require('./middlewares/logger.middleware');
 require('dotenv').config();
 
 // Importação das rotas (as que você criou na pasta routes)
@@ -12,6 +15,8 @@ const app = express();
 app.use(helmet()); // Proteção de cabeçalhos HTTP
 app.use(cors());   // Libera acesso para o Front-end
 app.use(express.json()); // Permite que o servidor entenda JSON
+app.use(logger);
+app.use('/alumni', alumniRoutes);
 
 // --- Rota de Teste (Health Check) ---
 app.get('/', (req, res) => {
@@ -35,3 +40,5 @@ app.listen(PORT, () => {
   🛠️  Ambiente pronto para JA, TD e F.
   `);
 });
+
+app.use(errorMiddleware);
