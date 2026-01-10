@@ -1,72 +1,88 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Header from '../../components/Header/Header';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import AlumniCard from '../../components/AlumniCard/AlumniCard';
 import Modal from '../../components/Modal/Modal';
 import Footer from '../../components/Footer/Footer';
-import AddAlumniModal from '../../components/AddAlumniModal/AddAlumniModal'; // Modal de cadastro de ex-aluno
-import { Search, Filter, Plus, RotateCcw } from 'lucide-react';
-import { getAlumni } from '../../services/api';
-
+import AddAlumniModal from '../../components/AddAlumniModal/AddAlumniModal';
+import { Search } from 'lucide-react';
+import { getAlumni, upsertMyProfile, getMyProfile } from '../../services/api';
 
 // Estilos
 import styles from './Home.module.css';
 
 const Home = ({ isLoggedIn, setIsLoggedIn }) => {
-
-  const [alumni, setAlumni] = useState([]); // Começa vazio
+  const [alumni, setAlumni] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // --- ESTADOS ---
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCurso, setSelectedCurso] = useState('');
   const [selectedAno, setSelectedAno] = useState('');
-  const [selectedAlumni, setSelectedAlumni] = useState(null); // Controla o Modal
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false); //controla o Modal de adcionar um novo ex aluno
+  const [selectedAlumni, setSelectedAlumni] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [hasProfile, setHasProfile] = useState(false);
+  async function fetchAlumni() {
+    setLoading(true);
+    try {
+      const response = await getAlumni();
+      setAlumni(response.data);
+    } catch (err) {
+      console.error('Erro ao carregar alumni:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    getAlumni()
-      .then(response => {
-        setAlumni(response.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Erro ao carregar alumni:", err);
-        setLoading(false);
-      });
+    fetchAlumni();
   }, []);
 
+  //Botao virar EDITAR
+
+  useEffect(() => {
+    if (!isLoggedIn) return setHasProfile(false);
+
+    getMyProfile()
+      .then(() => setHasProfile(true))
+      .catch((err) => {
+        if (err?.response?.status === 404) setHasProfile(false);
+      });
+  }, [isLoggedIn]);
   // --- LÓGICA DE DADOS ---
 
+  const filteredAlumni = useMemo(() => {
+    return alumni.filter((alumnus) => {
+      const matchesSearch = (alumnus.fullName || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
 
-  // Filtra a lista principal com base nos 3 critérios simultâneos
-  const filteredAlumni = alumni.filter((alumnus) => {
-    const matchesSearch = alumnus.fullName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCurso = selectedCurso === "" || alumnus.course === selectedCurso;
-    const matchesAno = selectedAno === "" || String(alumnus.graduationYear) === String(selectedAno);
-    return matchesSearch && matchesCurso && matchesAno;
-  });
+      const matchesCurso =
+        selectedCurso === '' || alumnus.course === selectedCurso;
 
-  // Gera listas para os filtros baseadas nos dados REAIS
-  const cursosUnicos = [...new Set(alumni.map((a) => a.course))].sort();
-  const anosUnicos = [...new Set(alumni.map((a) => a.graduationYear))].sort((a, b) => b - a);
+      const matchesAno =
+        selectedAno === '' ||
+        String(alumnus.graduationYear) === String(selectedAno);
 
-  if (loading) return <div>Carregando ex-alunos...</div>;
+      return matchesSearch && matchesCurso && matchesAno;
+    });
+  }, [alumni, searchTerm, selectedCurso, selectedAno]);
+
+  const cursosUnicos = useMemo(() => {
+    return [...new Set(alumni.map((a) => a.course).filter(Boolean))].sort();
+  }, [alumni]);
+
+  const anosUnicos = useMemo(() => {
+    return [
+      ...new Set(alumni.map((a) => a.graduationYear).filter(Boolean)),
+    ].sort((a, b) => b - a);
+  }, [alumni]);
 
   // --- HANDLERS ---
+  const handleOpenModal = (alumnus) => setSelectedAlumni(alumnus);
+  const handleCloseModal = () => setSelectedAlumni(null);
 
-  const handleOpenModal = (alumnus) => {
-    setSelectedAlumni(alumnus);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedAlumni(null);
-  };
-
-  const handleAddProfile = () => {
-    setIsAddModalOpen(true);
-    // O Header chama esse handler via prop (onAddClick) quando o usuário clica em "Adicionar Perfil".
-  };
+  if (loading) return <div>Carregando ex-alunos...</div>;
 
   return (
     <div className={styles.wrapper}>
@@ -74,10 +90,10 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
         isLoggedIn={isLoggedIn}
         setIsLoggedIn={setIsLoggedIn}
         onAddClick={() => setIsAddModalOpen(true)}
+        addLabel={hasProfile ? 'Editar Perfil' : 'Adicionar Perfil'}
       />
 
       <main className={styles.container}>
-        {/* 2. Barra de Busca e Filtros Dinâmicos */}
         <SearchBar
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
@@ -89,13 +105,11 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
           onAnoChange={setSelectedAno}
         />
 
-        {/* 3. Contador de Resultados */}
         <p className={styles.resultsInfo}>
-          Mostrando <strong>{filteredAlumni.length}</strong> de{' '}
-          {alumni.length} ex-alunos
+          Mostrando <strong>{filteredAlumni.length}</strong> de {alumni.length}{' '}
+          ex-alunos
         </p>
 
-        {/* 4. Grid de Cards - APENAS UM BLOCO AQUI */}
         {filteredAlumni.length > 0 ? (
           <section className={styles.cardsGrid}>
             {filteredAlumni.map((alumnus) => (
@@ -112,7 +126,10 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
               <Search size={48} color="#cc4b00" />
             </div>
             <h2>Nenhum resultado encontrado</h2>
-            <p>Não encontramos nenhum ex-aluno que corresponda aos filtros selecionados.</p>
+            <p>
+              Não encontramos nenhum ex-aluno que corresponda aos filtros
+              selecionados.
+            </p>
             <button
               className={styles.clearBtn}
               onClick={() => {
@@ -127,22 +144,29 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
         )}
       </main>
 
-      {/* 5. Modal de Detalhes (só aparece se selectedAlumni não for null) */}
+      {/* Modal de Detalhes */}
       {selectedAlumni && (
         <Modal data={selectedAlumni} onClose={handleCloseModal} />
       )}
-      {/* 6. Modal de Cadastro de Ex-Aluno */}
+
+      {/* Modal de Cadastro/Perfil */}
       {isAddModalOpen && (
         <AddAlumniModal
-          // Mantém a API do modal explícita:
-          // - isOpen controla renderização interna do componente
-          // - onClose fecha e volta o estado para false no Home
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
+          onSubmit={async (payload) => {
+            // 1) salva/atualiza o perfil do usuário logado
+            await upsertMyProfile(payload);
+
+            // 2) fecha o modal
+            setIsAddModalOpen(false);
+
+            // 3) recarrega a listagem pública (pra aparecer o card atualizado)
+            await fetchAlumni();
+          }}
         />
       )}
 
-      {/* 7. Rodapé */}
       <Footer />
     </div>
   );

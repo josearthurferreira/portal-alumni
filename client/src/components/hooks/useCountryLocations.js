@@ -2,16 +2,20 @@ import { useMemo } from 'react';
 import { Country, State, City } from 'country-state-city';
 import { useIbgeLocations } from './useIbgeLocations';
 
+const norm = (v) => String(v ?? '').trim();
+
 function sortByNamePtBr(a, b) {
   return (a?.name || '').localeCompare(b?.name || '', 'pt-BR');
 }
 
 export function useCountryLocations(isOpen, countryIso2, stateCode) {
-  const isBrazil = countryIso2 === 'BR';
+  const iso2 = norm(countryIso2);
+  const st = norm(stateCode);
+  const isBrazil = iso2 === 'BR';
 
   const countries = useMemo(() => {
     const list = Country.getAllCountries()
-      .map((c) => ({ name: c.name, iso2: c.isoCode }))
+      .map((c) => ({ name: norm(c.name), iso2: norm(c.isoCode) }))
       .filter((c) => c.iso2 && c.name)
       .sort((a, b) => {
         if (a.iso2 === 'BR') return -1;
@@ -22,59 +26,60 @@ export function useCountryLocations(isOpen, countryIso2, stateCode) {
     return list;
   }, []);
 
-  const ibge = useIbgeLocations(isOpen, isBrazil ? stateCode : '', isBrazil);
+  const ibge = useIbgeLocations(isOpen, isBrazil ? st : '', isBrazil);
 
   const states = useMemo(() => {
     if (!isOpen) return [];
 
     if (isBrazil) {
-      return (ibge.ufs || []).map((u) => ({ code: u.sigla, name: u.nome }));
+      return (ibge.ufs || []).map((u) => ({
+        code: norm(u.sigla),
+        name: norm(u.nome),
+      }));
     }
 
-    if (!countryIso2) return [];
+    if (!iso2) return [];
 
-    return State.getStatesOfCountry(countryIso2)
-      .map((s) => ({ code: s.isoCode || s.name, name: s.name }))
+    return State.getStatesOfCountry(iso2)
+      .map((s) => ({ code: norm(s.isoCode || s.name), name: norm(s.name) }))
       .filter((s) => s.code && s.name)
       .sort(sortByNamePtBr);
-  }, [isOpen, isBrazil, countryIso2, ibge.ufs]);
+  }, [isOpen, isBrazil, iso2, ibge.ufs, st]);
 
   const hasStates = states.length > 0;
-
-  const citiesReady = isOpen && !!countryIso2 && (!hasStates || !!stateCode);
+  const citiesReady = isOpen && !!iso2 && (!hasStates || !!st);
 
   const cities = useMemo(() => {
     if (!isOpen) return [];
 
     if (isBrazil) {
-      return Array.isArray(ibge.cities) ? ibge.cities : [];
+      return Array.isArray(ibge.cities)
+        ? ibge.cities.map(norm).filter(Boolean)
+        : [];
     }
 
-    if (!countryIso2) return [];
+    if (!iso2) return [];
 
     if (hasStates) {
-      if (!stateCode) return [];
-      return City.getCitiesOfState(countryIso2, stateCode)
-        .map((c) => c.name)
+      if (!st) return [];
+      return City.getCitiesOfState(iso2, st)
+        .map((c) => norm(c.name))
         .filter(Boolean)
         .sort((a, b) => a.localeCompare(b, 'pt-BR'));
     }
 
-    const getByCountry = City.getCitiesOfCountry?.bind(City);
-    const list = getByCountry ? getByCountry(countryIso2) : [];
-
+    const list = City.getCitiesOfCountry?.(iso2) || [];
     return (list || [])
-      .map((c) => c.name)
+      .map((c) => norm(c.name))
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b, 'pt-BR'));
-  }, [isOpen, isBrazil, countryIso2, stateCode, ibge.cities, hasStates]);
+  }, [isOpen, isBrazil, iso2, st, ibge.cities, hasStates]);
 
   const citiesAvailable = citiesReady && cities.length > 0;
   const allowManualCity = citiesReady && cities.length === 0;
 
-  // ✅ Bangladesh etc: tem estado selecionado, mas a lib não tem cidades
   const needsAddressComplement =
-    citiesReady && hasStates && !!stateCode && cities.length === 0;
+    citiesReady && hasStates && !!st && cities.length === 0;
 
   return {
     countries,

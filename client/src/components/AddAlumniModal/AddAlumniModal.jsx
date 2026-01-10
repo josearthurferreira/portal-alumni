@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import './AddAlumniModal.css';
+import { getMe, getMyProfile } from '../../services/api';
 
 import { useCountryLocations } from '../hooks/useCountryLocations';
 
@@ -105,31 +106,23 @@ const SUGGESTIONS_BY_CATEGORY = {
   Idiomas: ['Inglês Fluente', 'Espanhol', 'Francês', 'Alemão'],
 };
 
-// MOCK vindo do "login"
-const MOCK_FULL_NAME = 'João da Silva Filho';
-const MOCK_EMAIL = 'joao.silva@gmail.com';
-
 const initialForm = {
-  fullName: MOCK_FULL_NAME,
+  fullName: '',
   preferredName: '',
   birthDate: '',
-
   course: '',
   graduationYear: '',
-
   countryIso2: '',
   stateUf: '',
   city: '',
-  addressComplement: '', // ✅ novo (opcional)
-
+  addressComplement: '',
   organization: '',
   role: '',
-  email: MOCK_EMAIL,
+  email: '',
   phone: '',
   linkedinUser: '',
   bio: '',
   skills: [],
-
   photoFile: null,
   photoPreviewUrl: '',
 };
@@ -170,12 +163,20 @@ export default function AddAlumniModal({
     hasStates,
     allowManualCity,
     citiesAvailable,
-    needsAddressComplement, // ✅ novo (Bangladesh etc.)
+    needsAddressComplement, //  novo (Bangladesh etc.)
   } = useCountryLocations(isOpen, form.countryIso2, form.stateUf);
 
   // Antes de selecionar país, mantém Estado/Cidade visíveis (placeholders).
   // Se selecionar um país SEM estados, some Estado/Cidade e entra "Complemento / Cidade".
   const showStateAndCity = !form.countryIso2 || hasStates;
+
+  // refs pra hidratação (pra não sumir city/complement quando preencher vindo do backend)
+  const isHydratingRef = useRef(false);
+  const pendingCityRef = useRef('');
+  const pendingComplementRef = useRef('');
+
+  // Em relação a se o perfil está criado ou não, se ele existe é só editar
+  const [isEditing, setIsEditing] = useState(false);
 
   function setField(name, value) {
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -214,20 +215,111 @@ export default function AddAlumniModal({
     );
   };
 
+  // const do aniversario
+  const birthIsoDate = form.birthDate.trim()
+    ? brToIso(form.birthDate.trim())
+    : '';
+  const birthIsoDateTime = birthIsoDate
+    ? `${birthIsoDate}T00:00:00.000Z`
+    : null;
+
   // reset ao abrir
   useEffect(() => {
     if (!isOpen) return;
-    setForm(initialForm);
-    setExtraErrors({});
-    setIsSubmitting(false);
-    setShowValidation(false);
-    setSkillInput('');
-    setShowSuggestions(false);
+
+    (async () => {
+      try {
+        // 1) sempre pega dados da conta (users)
+        const res = await getMe();
+        const me = res.data;
+
+        setForm((prev) => ({
+          ...prev,
+          fullName: me.fullName || '',
+          email: me.email || '',
+        }));
+
+        // 2) tenta pegar o perfil (alumni)
+        try {
+          const profRes = await getMyProfile();
+          const p = profRes.data;
+
+          setIsEditing(true);
+
+          isHydratingRef.current = true;
+          pendingCityRef.current = (p.city || '').trim();
+          pendingComplementRef.current = (p.addressComplement || '').trim();
+          isHydratingRef.current = true;
+
+          setForm((prev) => ({
+            ...prev,
+
+            preferredName: p.preferredName || '',
+
+            // birthDate vem ISO -> converte pra dd/mm/aaaa
+            birthDate: p.birthDate
+              ? isoToBr(String(p.birthDate).slice(0, 10))
+              : '',
+
+            course: p.course || '',
+            graduationYear: p.graduationYear ? String(p.graduationYear) : '',
+
+            countryIso2: p.country || '',
+            stateUf: p.state || '',
+            city: '', // não setei city aqui pq tava bugando quando puxava pra editar
+            addressComplement: '', // a exata mesma coisa com o complemento
+
+            organization: p.organization || '',
+            role: p.role || '',
+            phone: p.phone || '',
+
+            // linkedinUrl -> username
+            linkedinUser: (p.linkedinUrl || '')
+              .replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')
+              .replace(/\/$/, ''),
+
+            bio: p.bio || '',
+
+            // skills pode vir array ou string
+            skills: Array.isArray(p.skills)
+              ? p.skills
+              : typeof p.skills === 'string' && p.skills.trim()
+              ? p.skills
+                  .split(',')
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+              : [],
+          }));
+        } catch (err) {
+          // 404 = não tem perfil ainda (normal)
+          if (err?.response?.status === 404) {
+            setIsEditing(false);
+          } else {
+            console.error(err);
+          }
+
+          // se não tem perfil, garante que não fica "travado" em hidratação
+          pendingCityRef.current = '';
+          pendingComplementRef.current = '';
+          isHydratingRef.current = false;
+        }
+
+        setExtraErrors((prev) => ({ ...prev, _form: '' }));
+      } catch (err) {
+        console.error(err);
+        setExtraErrors((prev) => ({
+          ...prev,
+          _form: 'Sessão expirada. Faça login novamente.',
+        }));
+      }
+    })();
   }, [isOpen]);
 
   // País mudou -> zera Estado, Cidade e Complemento
   useEffect(() => {
     if (!isOpen) return;
+    if (isHydratingRef.current) return;
+
     setForm((prev) => ({
       ...prev,
       stateUf: '',
@@ -241,9 +333,69 @@ export default function AddAlumniModal({
   useEffect(() => {
     if (!isOpen) return;
     if (!hasStates) return;
+    if (isHydratingRef.current) return;
+
     setForm((prev) => ({ ...prev, city: '', addressComplement: '' }));
     setExtraErrors((prev) => ({ ...prev, city: '' }));
   }, [isOpen, form.stateUf, hasStates]);
+
+  //  aplica city e addressComplement pendentes depois que país/estado/cidades estiverem prontos
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const pendingCity = (pendingCityRef.current || '').trim();
+    const pendingComplement = (pendingComplementRef.current || '').trim();
+
+    // nada pendente
+    if (!pendingCity && !pendingComplement) return;
+
+    // espera país
+    if (!form.countryIso2) return;
+
+    // se o país tem estados, espera estado
+    if (hasStates && !form.stateUf) return;
+
+    // se é modo "select de cidades", espera carregar as cidades
+    if (!needsAddressComplement && loadingCities) return;
+
+    // normaliza lista pra comparar com segurança
+    const citySet = new Set((cities || []).map((c) => String(c).trim()));
+
+    setForm((prev) => {
+      const next = { ...prev };
+
+      // aplica city
+      if (!next.city && pendingCity) {
+        if (!next.city && pendingCity) {
+          next.city = pendingCity; // seta sempre (a UI resolve com fallback option)
+        } else {
+          // modo select: só seta se existir na lista
+          if (citySet.has(pendingCity)) next.city = pendingCity;
+        }
+      }
+
+      // aplica complemento (opcional)
+      if (!next.addressComplement && pendingComplement) {
+        next.addressComplement = pendingComplement;
+      }
+
+      return next;
+    });
+
+    // só limpa depois de aplicar
+    pendingCityRef.current = '';
+    pendingComplementRef.current = '';
+    isHydratingRef.current = false;
+  }, [
+    isOpen,
+    form.countryIso2,
+    form.stateUf,
+    hasStates,
+    needsAddressComplement,
+    loadingCities,
+    cities,
+  ]);
 
   // evita leak de preview de imagem (correto)
   useEffect(() => {
@@ -328,17 +480,32 @@ export default function AddAlumniModal({
       return;
     }
 
+    //  evita fechar sem salvar se alguém esquecer de passar onSubmit
+    if (!onSubmit) {
+      setExtraErrors((prev) => ({
+        ...prev,
+        _form: 'Erro: ação de salvar não configurada (onSubmit ausente).',
+      }));
+      return;
+    }
+
     try {
       setIsSubmitting(true);
+      setExtraErrors((prev) => ({ ...prev, _form: '' }));
+
+      const birthIsoDate = form.birthDate.trim()
+        ? brToIso(form.birthDate.trim())
+        : '';
+      const birthIsoDateTime = birthIsoDate
+        ? `${birthIsoDate}T00:00:00.000Z`
+        : null;
 
       const payload = {
         fullName: form.fullName.trim(),
         email: form.email.trim(),
         preferredName: form.preferredName.trim(),
 
-        birthDate: form.birthDate.trim()
-          ? brToIso(form.birthDate.trim())
-          : null,
+        birthDate: birthIsoDateTime,
 
         course: form.course,
         graduationYear: form.graduationYear
@@ -349,7 +516,6 @@ export default function AddAlumniModal({
         state: hasStates ? form.stateUf : null,
         city: form.city,
 
-        // ✅ opcional: só manda se tiver preenchido
         ...(form.addressComplement.trim()
           ? { addressComplement: form.addressComplement.trim() }
           : {}),
@@ -364,12 +530,18 @@ export default function AddAlumniModal({
 
         bio: form.bio.trim(),
         skills: form.skills,
-
-        photoFile: form.photoFile || null,
       };
 
-      await onSubmit?.(payload);
+      await onSubmit(payload);
+
       onClose?.();
+    } catch (err) {
+      const backendMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        'Não foi possível salvar seu perfil.';
+
+      setExtraErrors((prev) => ({ ...prev, _form: backendMsg }));
     } finally {
       setIsSubmitting(false);
     }
@@ -391,6 +563,12 @@ export default function AddAlumniModal({
             ×
           </button>
         </header>
+
+        {extraErrors._form ? (
+          <div className="formError" role="alert">
+            {extraErrors._form}
+          </div>
+        ) : null}
 
         <form
           ref={formRef}
@@ -613,7 +791,7 @@ export default function AddAlumniModal({
               }
             />
 
-            {/* Estado + Cidade (padrão). Se o país não tiver estados, entra "Complemento / Cidade". */}
+            {/* Estado + Cidade (padrão). Se o país não tiver cidades, entra Cidade manual + complemento opcional. */}
             {showStateAndCity ? (
               <>
                 <Field
@@ -633,8 +811,8 @@ export default function AddAlumniModal({
                         {!form.countryIso2
                           ? 'Primeiro selecione o país'
                           : loadingStates
-                            ? 'Carregando estados...'
-                            : 'Selecione o estado'}
+                          ? 'Carregando estados...'
+                          : 'Selecione o estado'}
                       </option>
 
                       {states.map((s) => (
@@ -646,7 +824,7 @@ export default function AddAlumniModal({
                   }
                 />
 
-                {/* ✅ Só mostra Cidade quando EXISTE lista de cidades */}
+                {/*  Se tiver lista de cidades: select normal */}
                 {!needsAddressComplement ? (
                   <Field
                     label="Cidade"
@@ -667,44 +845,74 @@ export default function AddAlumniModal({
                           {!form.countryIso2
                             ? 'Selecione o país'
                             : !form.stateUf
-                              ? 'Selecione o estado'
-                              : loadingCities
-                                ? 'Carregando cidades...'
-                                : 'Selecione a cidade'}
+                            ? 'Selecione o estado'
+                            : loadingCities
+                            ? 'Carregando cidades...'
+                            : 'Selecione a cidade'}
                         </option>
 
+                        {/*  fallback: se a cidade salva não estiver na lista, cria uma opção pra ela */}
+                        {form.city &&
+                        !loadingCities &&
+                        Array.isArray(cities) &&
+                        !cities.includes(String(form.city).trim()) ? (
+                          <option value={String(form.city).trim()}>
+                            {String(form.city).trim()} (salvo)
+                          </option>
+                        ) : null}
+
                         {cities.map((city) => (
-                          <option key={city} value={city}>
-                            {city}
+                          <option key={city} value={String(city).trim()}>
+                            {String(city).trim()}
                           </option>
                         ))}
                       </select>
                     }
                   />
-                ) : null}
+                ) : (
+                  <>
+                    {/*  Se NÃO tiver cidades: cidade manual (salva em form.city) */}
+                    <Field
+                      label="Cidade / Região"
+                      required
+                      fullWidth
+                      input={
+                        <input
+                          name="city"
+                          value={form.city}
+                          onChange={(e) => setField('city', e.target.value)}
+                          disabled={!form.countryIso2 || !form.stateUf}
+                          placeholder="Ex: Dinajpur, bairro, região, distrito..."
+                          required
+                          onInvalid={(e) => applyPtBrValidityMessage(e.target)}
+                          onInput={(e) => e.target.setCustomValidity('')}
+                        />
+                      }
+                    />
 
-                {/* ✅ Se não tem cidades (Bangladesh etc.), mostra só complemento (opcional) */}
-                {needsAddressComplement ? (
-                  <Field
-                    label="Complemento do endereço"
-                    fullWidth
-                    input={
-                      <input
-                        name="addressComplement"
-                        value={form.addressComplement}
-                        onChange={(e) =>
-                          setField('addressComplement', e.target.value)
-                        }
-                        disabled={!form.countryIso2 || !form.stateUf}
-                        placeholder="Ex: bairro, região, vila, distrito..."
-                      />
-                    }
-                  />
-                ) : null}
+                    {/*  Complemento opcional */}
+                    <Field
+                      label="Complemento do endereço"
+                      fullWidth
+                      input={
+                        <input
+                          name="addressComplement"
+                          value={form.addressComplement}
+                          onChange={(e) =>
+                            setField('addressComplement', e.target.value)
+                          }
+                          disabled={!form.countryIso2 || !form.stateUf}
+                          placeholder="Opcional (ex: rua, número, referência...)"
+                        />
+                      }
+                    />
+                  </>
+                )}
               </>
             ) : (
               <Field
-                label="Complemento do endereço"
+                label="Cidade / Região"
+                required
                 fullWidth
                 input={
                   <input
@@ -712,10 +920,14 @@ export default function AddAlumniModal({
                     value={form.city}
                     onChange={(e) => setField('city', e.target.value)}
                     placeholder="Digite sua cidade ou província"
+                    required
+                    onInvalid={(e) => applyPtBrValidityMessage(e.target)}
+                    onInput={(e) => e.target.setCustomValidity('')}
                   />
                 }
               />
             )}
+
             <Field
               label="Empresa/Instituição"
               input={
@@ -877,7 +1089,13 @@ export default function AddAlumniModal({
               className="submitButton"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Adicionando...' : 'Adicionar Perfil'}
+              {isSubmitting
+                ? isEditing
+                  ? 'Salvando...'
+                  : 'Adicionando...'
+                : isEditing
+                ? 'Salvar Alterações'
+                : 'Adicionar Perfil'}
             </button>
           </footer>
         </form>
