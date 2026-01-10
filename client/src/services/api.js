@@ -12,7 +12,12 @@ api.interceptors.request.use((config) => {
 });
 
 // Alumni (público)
-export const getAlumni = () => api.get('/alumni');
+export const getAlumni = (filters = {}) => {
+  const cleanFilters = Object.fromEntries(
+    Object.entries(filters).filter(([_, v]) => v != null && v !== "")
+  );
+  return api.get('/alumni', { params: cleanFilters });
+};
 
 // Auth
 export const register = (payload) => api.post('/auth/register', payload);

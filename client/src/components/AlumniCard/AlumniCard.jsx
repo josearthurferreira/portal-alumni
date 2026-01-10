@@ -5,7 +5,7 @@ import styles from './AlumniCard.module.css';
 const AlumniCard = ({ data, onClick }) => {
   return (
     <div className={styles.card} onClick={() => onClick(data)}>
-      <img src={data.foto} alt={data.nome} className={styles.profilePic} />
+      <img src={data.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName)}&background=random`} alt={data.nome} className={styles.profilePic} />
       <h3>{data.fullName}</h3>
       <p><GraduationCap size={16} /> {data.course}</p>
       <p><Calendar size={16} /> Turma de {data.graduationYear}</p>

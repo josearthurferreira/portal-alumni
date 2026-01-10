@@ -6,6 +6,7 @@ import Modal from '../../components/Modal/Modal';
 import Footer from '../../components/Footer/Footer';
 import AddAlumniModal from '../../components/AddAlumniModal/AddAlumniModal';
 import { Search } from 'lucide-react';
+import ErrorBanner from '../../components/ErrorBanner/ErrorBanner';
 import { getAlumni, upsertMyProfile, getMyProfile } from '../../services/api';
 
 // Estilos
@@ -14,6 +15,8 @@ import styles from './Home.module.css';
 const Home = ({ isLoggedIn, setIsLoggedIn }) => {
   const [alumni, setAlumni] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterOptions, setFilterOptions] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   // --- ESTADOS ---
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,21 +25,35 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
-  async function fetchAlumni() {
+
+  async function fetchAlumni(filters = {}) {
     setLoading(true);
+    setErrorMessage(null);
     try {
-      const response = await getAlumni();
+      const response = await getAlumni(filters);
       setAlumni(response.data);
+
+      // Se for a primeira carga (sem filtros), guardamos para as opções de curso/ano
+      if (Object.keys(filters).length === 0) {
+        setFilterOptions(response.data);
+      }
     } catch (err) {
-      console.error('Erro ao carregar alumni:', err);
+      const msg = err.response?.data?.message || "Erro ao carregar dados.";
+      setErrorMessage(msg);
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchAlumni();
-  }, []);
+    const query = {};
+    if (selectedCurso) query.course = selectedCurso;
+    if (selectedAno) query.graduationYear = selectedAno;
+    // Se quiser busca por nome no backend, adicione aqui (veja nota abaixo)
+    // if (searchTerm) query.fullName = searchTerm;
+
+    fetchAlumni(query);
+  }, [selectedCurso, selectedAno]);
 
   //Botao virar EDITAR
 
@@ -51,38 +68,24 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
   }, [isLoggedIn]);
   // --- LÓGICA DE DADOS ---
 
-  const filteredAlumni = useMemo(() => {
-    return alumni.filter((alumnus) => {
-      const matchesSearch = (alumnus.fullName || '')
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-
-      const matchesCurso =
-        selectedCurso === '' || alumnus.course === selectedCurso;
-
-      const matchesAno =
-        selectedAno === '' ||
-        String(alumnus.graduationYear) === String(selectedAno);
-
-      return matchesSearch && matchesCurso && matchesAno;
-    });
-  }, [alumni, searchTerm, selectedCurso, selectedAno]);
-
   const cursosUnicos = useMemo(() => {
-    return [...new Set(alumni.map((a) => a.course).filter(Boolean))].sort();
-  }, [alumni]);
+    return [...new Set(filterOptions.map((a) => a.course).filter(Boolean))].sort();
+  }, [filterOptions]);
 
   const anosUnicos = useMemo(() => {
-    return [
-      ...new Set(alumni.map((a) => a.graduationYear).filter(Boolean)),
-    ].sort((a, b) => b - a);
-  }, [alumni]);
+    return [...new Set(filterOptions.map((a) => a.graduationYear).filter(Boolean))]
+      .sort((a, b) => b - a);
+  }, [filterOptions]);
 
   // --- HANDLERS ---
   const handleOpenModal = (alumnus) => setSelectedAlumni(alumnus);
   const handleCloseModal = () => setSelectedAlumni(null);
 
-  if (loading) return <div>Carregando ex-alunos...</div>;
+  const filteredAlumni = useMemo(() => {
+    return alumni.filter((alumnus) =>
+      (alumnus.fullName || '').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [alumni, searchTerm]);
 
   return (
     <div className={styles.wrapper}>
@@ -94,6 +97,11 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
       />
 
       <main className={styles.container}>
+        <ErrorBanner
+          message={errorMessage}
+          onClose={() => setErrorMessage(null)}
+        />
+
         <SearchBar
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
@@ -106,11 +114,24 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
         />
 
         <p className={styles.resultsInfo}>
-          Mostrando <strong>{filteredAlumni.length}</strong> de {alumni.length}{' '}
-          ex-alunos
+          {loading ? (
+            ""
+          ) : (
+            <>Mostrando <strong>{filteredAlumni.length}</strong> de {alumni.length} ex-alunos</>
+          )}
         </p>
 
-        {filteredAlumni.length > 0 ? (
+        {loading ? (
+          <section>
+            <div className={styles.loadingGrid}>
+              {/* Criamos 6 cards falsos enquanto carrega */}
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                <div key={n} className={styles.skeletonCard}></div>
+              ))}
+            </div>
+            <p className={styles.loadingText}>Buscando ex-alunos na base de dados...</p>
+          </section>
+        ) : filteredAlumni.length > 0 ? (
           <section className={styles.cardsGrid}>
             {filteredAlumni.map((alumnus) => (
               <AlumniCard
@@ -143,7 +164,6 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
           </div>
         )}
       </main>
-
       {/* Modal de Detalhes */}
       {selectedAlumni && (
         <Modal data={selectedAlumni} onClose={handleCloseModal} />
