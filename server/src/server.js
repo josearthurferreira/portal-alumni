@@ -35,15 +35,19 @@ app.get('/', (req, res) => {
 // --- Configuração de Rotas Futuras ---
 // app.use('/alumni', alumniRoutes);
 
-// --- Inicialização do Servidor ---
-const PORT = process.env.PORT || 3001;
+// --- Middleware de Erro (DEVE ser o último antes do export/listen) ---
 app.use(errorMiddleware);
-app.listen(PORT, () => {
-  console.log(`
-  🚀 Servidor voando!
-  📡 URL: http://localhost:${PORT}
-  🛠️  Ambiente pronto para JA, TD e F.
-  `);
-});
 
+// --- Inicialização do Servidor (Local) ---
+const PORT = process.env.PORT || 3001;
+
+// Na Vercel, o 'listen' não é estritamente necessário,
+// mas mantemos para você rodar localmente com 'npm run dev'
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor voando em http://localhost:${PORT}`);
+  });
+}
+
+// --- ESSENCIAL PARA VERCEL ---
 module.exports = app;
