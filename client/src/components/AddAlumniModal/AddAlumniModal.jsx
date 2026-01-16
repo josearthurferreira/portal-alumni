@@ -82,30 +82,6 @@ const ALL_SKILLS = [
   'Lean Manufacturing',
 ];
 
-const SUGGESTIONS_BY_CATEGORY = {
-  'Engenharia & Técnica': [
-    'AutoCAD',
-    'SolidWorks',
-    'MATLAB',
-    'Python',
-    'C++',
-    'Cálculo Estrutural',
-  ],
-  'Soft Skills': [
-    'Liderança',
-    'Comunicação Assertiva',
-    'Trabalho em Equipe',
-    'Gestão de Tempo',
-  ],
-  'Gestão & Negócios': [
-    'Planejamento Estratégico',
-    'Logística',
-    'Finanças',
-    'Gestão de Riscos',
-  ],
-  Idiomas: ['Inglês Fluente', 'Espanhol', 'Francês', 'Alemão'],
-};
-
 const initialForm = {
   fullName: '',
   preferredName: '',
@@ -153,6 +129,9 @@ export default function AddAlumniModal({
   // input date escondido pra abrir o calendário
   const hiddenDateRef = useRef(null);
 
+  // trava contra resets durante hidratação inicial
+  const isHydratingRef = useRef(false);
+
   const {
     countries,
     states,
@@ -161,29 +140,42 @@ export default function AddAlumniModal({
     loadingCities,
     isBrazil,
     hasStates,
-    allowManualCity,
-    citiesAvailable,
-    needsAddressComplement, //  novo (Bangladesh etc.)
+    needsAddressComplement, // país tem estado, mas não tem lista de cidades (ex: Bangladesh)
   } = useCountryLocations(isOpen, form.countryIso2, form.stateUf);
 
-  // Antes de selecionar país, mantém Estado/Cidade visíveis (placeholders).
-  // Se selecionar um país SEM estados, some Estado/Cidade e entra "Complemento / Cidade".
+  // País sem estados: some Estado e mostra só Cidade/Região
   const showStateAndCity = !form.countryIso2 || hasStates;
-
-  // refs pra hidratação (pra não sumir city/complement quando preencher vindo do backend)
-  const isHydratingRef = useRef(false);
-  const pendingCityRef = useRef('');
-  const pendingComplementRef = useRef('');
-
-  // Em relação a se o perfil está criado ou não, se ele existe é só editar
-  const [isEditing, setIsEditing] = useState(false);
 
   function setField(name, value) {
     setForm((prev) => ({ ...prev, [name]: value }));
     setExtraErrors((prev) => ({ ...prev, [name]: '' }));
   }
 
-  // Filtra a lista mestre baseada no que o usuário digita
+  // RESET SÓ QUANDO O USUÁRIO MUDA (não em useEffect)
+  function handleCountryChange(e) {
+    const newCountry = e.target.value;
+    setForm((prev) => ({
+      ...prev,
+      countryIso2: newCountry,
+      stateUf: '',
+      city: '',
+      addressComplement: '',
+    }));
+    setExtraErrors((prev) => ({ ...prev, stateUf: '', city: '' }));
+  }
+
+  function handleStateChange(e) {
+    const newState = e.target.value;
+    setForm((prev) => ({
+      ...prev,
+      stateUf: newState,
+      city: '',
+      addressComplement: '',
+    }));
+    setExtraErrors((prev) => ({ ...prev, city: '' }));
+  }
+
+  // sugestões de skills
   const filteredSuggestions = useMemo(() => {
     const query = skillInput.trim().toLowerCase();
     if (!query) return [];
@@ -215,21 +207,17 @@ export default function AddAlumniModal({
     );
   };
 
-  // const do aniversario
-  const birthIsoDate = form.birthDate.trim()
-    ? brToIso(form.birthDate.trim())
-    : '';
-  const birthIsoDateTime = birthIsoDate
-    ? `${birthIsoDate}T00:00:00.000Z`
-    : null;
+  const [isEditing, setIsEditing] = useState(false);
 
-  // reset ao abrir
+  // Hidrata ao abrir
   useEffect(() => {
     if (!isOpen) return;
 
     (async () => {
       try {
-        // 1) sempre pega dados da conta (users)
+        isHydratingRef.current = true;
+
+        // 1) pega dados da conta
         const res = await getMe();
         const me = res.data;
 
@@ -239,24 +227,17 @@ export default function AddAlumniModal({
           email: me.email || '',
         }));
 
-        // 2) tenta pegar o perfil (alumni)
+        // 2) tenta pegar perfil
         try {
           const profRes = await getMyProfile();
           const p = profRes.data;
 
           setIsEditing(true);
 
-          isHydratingRef.current = true;
-          pendingCityRef.current = (p.city || '').trim();
-          pendingComplementRef.current = (p.addressComplement || '').trim();
-          isHydratingRef.current = true;
-
           setForm((prev) => ({
             ...prev,
-
             preferredName: p.preferredName || '',
 
-            // birthDate vem ISO -> converte pra dd/mm/aaaa
             birthDate: p.birthDate
               ? isoToBr(String(p.birthDate).slice(0, 10))
               : '',
@@ -264,23 +245,27 @@ export default function AddAlumniModal({
             course: p.course || '',
             graduationYear: p.graduationYear ? String(p.graduationYear) : '',
 
+            // backend pode retornar country/state/city direto (ok)
             countryIso2: p.country || '',
             stateUf: p.state || '',
-            city: '', // não setei city aqui pq tava bugando quando puxava pra editar
-            addressComplement: '', // a exata mesma coisa com o complemento
+            city: (p.city || '').trim(),
 
-            organization: p.organization || '',
+            // COMPAT: backend antigo usa addressComp/company
+            addressComplement: (
+              p.addressComplement ??
+              p.addressComp ??
+              ''
+            ).trim(),
+            organization: (p.organization ?? p.company ?? '').trim(),
+
             role: p.role || '',
             phone: p.phone || '',
 
-            // linkedinUrl -> username
             linkedinUser: (p.linkedinUrl || '')
               .replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')
               .replace(/\/$/, ''),
 
             bio: p.bio || '',
-
-            // skills pode vir array ou string
             skills: Array.isArray(p.skills)
               ? p.skills
               : typeof p.skills === 'string' && p.skills.trim()
@@ -291,17 +276,11 @@ export default function AddAlumniModal({
               : [],
           }));
         } catch (err) {
-          // 404 = não tem perfil ainda (normal)
           if (err?.response?.status === 404) {
             setIsEditing(false);
           } else {
             console.error(err);
           }
-
-          // se não tem perfil, garante que não fica "travado" em hidratação
-          pendingCityRef.current = '';
-          pendingComplementRef.current = '';
-          isHydratingRef.current = false;
         }
 
         setExtraErrors((prev) => ({ ...prev, _form: '' }));
@@ -311,93 +290,16 @@ export default function AddAlumniModal({
           ...prev,
           _form: 'Sessão expirada. Faça login novamente.',
         }));
+      } finally {
+        // solta a trava no próximo tick (evita resets durante render inicial)
+        setTimeout(() => {
+          isHydratingRef.current = false;
+        }, 0);
       }
     })();
   }, [isOpen]);
 
-  // País mudou -> zera Estado, Cidade e Complemento
-  useEffect(() => {
-    if (!isOpen) return;
-    if (isHydratingRef.current) return;
-
-    setForm((prev) => ({
-      ...prev,
-      stateUf: '',
-      city: '',
-      addressComplement: '',
-    }));
-    setExtraErrors((prev) => ({ ...prev, stateUf: '', city: '' }));
-  }, [isOpen, form.countryIso2]);
-
-  // Estado mudou -> zera Cidade e Complemento (só se o país tiver estados)
-  useEffect(() => {
-    if (!isOpen) return;
-    if (!hasStates) return;
-    if (isHydratingRef.current) return;
-
-    setForm((prev) => ({ ...prev, city: '', addressComplement: '' }));
-    setExtraErrors((prev) => ({ ...prev, city: '' }));
-  }, [isOpen, form.stateUf, hasStates]);
-
-  //  aplica city e addressComplement pendentes depois que país/estado/cidades estiverem prontos
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const pendingCity = (pendingCityRef.current || '').trim();
-    const pendingComplement = (pendingComplementRef.current || '').trim();
-
-    // nada pendente
-    if (!pendingCity && !pendingComplement) return;
-
-    // espera país
-    if (!form.countryIso2) return;
-
-    // se o país tem estados, espera estado
-    if (hasStates && !form.stateUf) return;
-
-    // se é modo "select de cidades", espera carregar as cidades
-    if (!needsAddressComplement && loadingCities) return;
-
-    // normaliza lista pra comparar com segurança
-    const citySet = new Set((cities || []).map((c) => String(c).trim()));
-
-    setForm((prev) => {
-      const next = { ...prev };
-
-      // aplica city
-      if (!next.city && pendingCity) {
-        if (!next.city && pendingCity) {
-          next.city = pendingCity; // seta sempre (a UI resolve com fallback option)
-        } else {
-          // modo select: só seta se existir na lista
-          if (citySet.has(pendingCity)) next.city = pendingCity;
-        }
-      }
-
-      // aplica complemento (opcional)
-      if (!next.addressComplement && pendingComplement) {
-        next.addressComplement = pendingComplement;
-      }
-
-      return next;
-    });
-
-    // só limpa depois de aplicar
-    pendingCityRef.current = '';
-    pendingComplementRef.current = '';
-    isHydratingRef.current = false;
-  }, [
-    isOpen,
-    form.countryIso2,
-    form.stateUf,
-    hasStates,
-    needsAddressComplement,
-    loadingCities,
-    cities,
-  ]);
-
-  // evita leak de preview de imagem (correto)
+  // evita leak de preview de imagem
   useEffect(() => {
     return () => {
       if (form.photoPreviewUrl) URL.revokeObjectURL(form.photoPreviewUrl);
@@ -480,7 +382,6 @@ export default function AddAlumniModal({
       return;
     }
 
-    //  evita fechar sem salvar se alguém esquecer de passar onSubmit
     if (!onSubmit) {
       setExtraErrors((prev) => ({
         ...prev,
@@ -514,7 +415,9 @@ export default function AddAlumniModal({
 
         country: form.countryIso2,
         state: hasStates ? form.stateUf : null,
-        city: form.city,
+
+        // sempre manda city (manual ou select)
+        city: form.city ? String(form.city).trim() : '',
 
         ...(form.addressComplement.trim()
           ? { addressComplement: form.addressComplement.trim() }
@@ -533,7 +436,6 @@ export default function AddAlumniModal({
       };
 
       await onSubmit(payload);
-
       onClose?.();
     } catch (err) {
       const backendMsg =
@@ -776,7 +678,7 @@ export default function AddAlumniModal({
                 <select
                   name="countryIso2"
                   value={form.countryIso2}
-                  onChange={(e) => setField('countryIso2', e.target.value)}
+                  onChange={handleCountryChange}
                   required
                   onInvalid={(e) => applyPtBrValidityMessage(e.target)}
                   onInput={(e) => e.target.setCustomValidity('')}
@@ -791,7 +693,6 @@ export default function AddAlumniModal({
               }
             />
 
-            {/* Estado + Cidade (padrão). Se o país não tiver cidades, entra Cidade manual + complemento opcional. */}
             {showStateAndCity ? (
               <>
                 <Field
@@ -801,7 +702,7 @@ export default function AddAlumniModal({
                     <select
                       name="stateUf"
                       value={form.stateUf}
-                      onChange={(e) => setField('stateUf', e.target.value)}
+                      onChange={handleStateChange}
                       required
                       disabled={!form.countryIso2 || loadingStates}
                       onInvalid={(e) => applyPtBrValidityMessage(e.target)}
@@ -824,7 +725,7 @@ export default function AddAlumniModal({
                   }
                 />
 
-                {/*  Se tiver lista de cidades: select normal */}
+                {/* Se tem lista de cidades: select */}
                 {!needsAddressComplement ? (
                   <Field
                     label="Cidade"
@@ -851,7 +752,7 @@ export default function AddAlumniModal({
                             : 'Selecione a cidade'}
                         </option>
 
-                        {/*  fallback: se a cidade salva não estiver na lista, cria uma opção pra ela */}
+                        {/* fallback se a cidade salva não estiver na lista */}
                         {form.city &&
                         !loadingCities &&
                         Array.isArray(cities) &&
@@ -871,7 +772,7 @@ export default function AddAlumniModal({
                   />
                 ) : (
                   <>
-                    {/*  Se NÃO tiver cidades: cidade manual (salva em form.city) */}
+                    {/* Sem lista de cidades: cidade manual + complemento */}
                     <Field
                       label="Cidade / Região"
                       required
@@ -890,7 +791,6 @@ export default function AddAlumniModal({
                       }
                     />
 
-                    {/*  Complemento opcional */}
                     <Field
                       label="Complemento do endereço"
                       fullWidth
@@ -910,6 +810,7 @@ export default function AddAlumniModal({
                 )}
               </>
             ) : (
+              // País sem estados
               <Field
                 label="Cidade / Região"
                 required
@@ -965,7 +866,7 @@ export default function AddAlumniModal({
             <Field
               label="Telefone (Nacional/Internacional)"
               required
-              hint="Opcional. Se internacional, inclua o DDI (+55, +1...)."
+              hint="Se internacional, inclua o DDI (+55, +1...)."
               error={extraErrors.phone}
               input={
                 <input

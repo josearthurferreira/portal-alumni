@@ -38,7 +38,7 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
         setFilterOptions(response.data);
       }
     } catch (err) {
-      const msg = err.response?.data?.message || "Erro ao carregar dados.";
+      const msg = err.response?.data?.message || 'Erro ao carregar dados.';
       setErrorMessage(msg);
     } finally {
       setLoading(false);
@@ -69,12 +69,15 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
   // --- LÓGICA DE DADOS ---
 
   const cursosUnicos = useMemo(() => {
-    return [...new Set(filterOptions.map((a) => a.course).filter(Boolean))].sort();
+    return [
+      ...new Set(filterOptions.map((a) => a.course).filter(Boolean)),
+    ].sort();
   }, [filterOptions]);
 
   const anosUnicos = useMemo(() => {
-    return [...new Set(filterOptions.map((a) => a.graduationYear).filter(Boolean))]
-      .sort((a, b) => b - a);
+    return [
+      ...new Set(filterOptions.map((a) => a.graduationYear).filter(Boolean)),
+    ].sort((a, b) => b - a);
   }, [filterOptions]);
 
   // --- HANDLERS ---
@@ -83,7 +86,7 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
 
   const filteredAlumni = useMemo(() => {
     return alumni.filter((alumnus) =>
-      (alumnus.fullName || '').toLowerCase().includes(searchTerm.toLowerCase())
+      (alumnus.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [alumni, searchTerm]);
 
@@ -115,9 +118,12 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
 
         <p className={styles.resultsInfo}>
           {loading ? (
-            ""
+            ''
           ) : (
-            <>Mostrando <strong>{filteredAlumni.length}</strong> de {alumni.length} ex-alunos</>
+            <>
+              Mostrando <strong>{filteredAlumni.length}</strong> de{' '}
+              {alumni.length} ex-alunos
+            </>
           )}
         </p>
 
@@ -129,7 +135,9 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
                 <div key={n} className={styles.skeletonCard}></div>
               ))}
             </div>
-            <p className={styles.loadingText}>Buscando ex-alunos na base de dados...</p>
+            <p className={styles.loadingText}>
+              Buscando ex-alunos na base de dados...
+            </p>
           </section>
         ) : filteredAlumni.length > 0 ? (
           <section className={styles.cardsGrid}>
@@ -177,7 +185,7 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
           onSubmit={async (payload) => {
             // 1) salva/atualiza o perfil do usuário logado
             await upsertMyProfile(payload);
-
+            setHasProfile(true);
             // 2) fecha o modal
             setIsAddModalOpen(false);
 

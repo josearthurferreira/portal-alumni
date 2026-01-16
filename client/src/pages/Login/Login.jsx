@@ -58,10 +58,10 @@ const Login = ({ setIsLoggedIn }) => {
 
       if (data?.errors?.length) {
         // Se o seu middleware retorna 'errors' do Zod:
-        msg = data.errors.map(e => e.mensagem).join(' | ');
+        msg = data.errors.map((e) => e.mensagem).join(' | ');
       } else if (data?.issues?.length) {
         // Fallback para o formato 'issues'
-        msg = data.issues.map(i => i.message).join(' | ');
+        msg = data.issues.map((i) => i.message).join(' | ');
       }
 
       setError(msg);
@@ -75,15 +75,12 @@ const Login = ({ setIsLoggedIn }) => {
         <p>Apenas membros cadastrados podem adicionar novos ex-alunos.</p>
 
         {/* 2. Substituímos o <p> antigo pelo ErrorBanner */}
-        <ErrorBanner
-          message={error}
-          onClose={() => setError('')}
-        />
+        <ErrorBanner message={error} onClose={() => setError('')} />
 
         {isRegister && (
           <input
             type="text"
-            placeholder="Nome"
+            placeholder="Nome Completo"
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}

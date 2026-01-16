@@ -90,7 +90,12 @@ async function upsertProfile(req, res, next) {
       }
     }
 
-    return res.status(200).json(profile);
+    return res.status(200).json({
+      ...profile,
+      organization: profile.company ?? profile.organization ?? null,
+      addressComplement:
+        profile.addressComp ?? profile.addressComplement ?? null,
+    });
   } catch (err) {
     next(err);
   }
@@ -118,7 +123,12 @@ async function getMyProfile(req, res, next) {
       return res.status(404).json({ message: 'Perfil não encontrado.' });
     }
 
-    return res.status(200).json(profile);
+    return res.status(200).json({
+      ...profile,
+      organization: profile.company ?? profile.organization ?? null,
+      addressComplement:
+        profile.addressComp ?? profile.addressComplement ?? null,
+    });
   } catch (err) {
     next(err);
   }
