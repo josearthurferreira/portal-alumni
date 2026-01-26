@@ -25,6 +25,9 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
+  //Paginacao
+  const PAGE_SIZE = 9;
+  const [page, setPage] = useState(1);
 
   async function fetchAlumni(filters = {}) {
     setLoading(true);
@@ -89,6 +92,15 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
       (alumnus.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [alumni, searchTerm]);
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, selectedCurso, selectedAno]);
+  const totalPages = Math.max(1, Math.ceil(filteredAlumni.length / PAGE_SIZE));
+
+  const pagedAlumni = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return filteredAlumni.slice(start, start + PAGE_SIZE);
+  }, [filteredAlumni, page]);
 
   return (
     <div className={styles.wrapper}>
@@ -121,8 +133,11 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
             ''
           ) : (
             <>
-              Mostrando <strong>{filteredAlumni.length}</strong> de{' '}
-              {alumni.length} ex-alunos
+              Mostrando <strong>{pagedAlumni.length}</strong> de{' '}
+              <strong>{filteredAlumni.length}</strong> ex-alunos
+              {filteredAlumni.length !== alumni.length && (
+                <> (total na base: {alumni.length})</>
+              )}
             </>
           )}
         </p>
@@ -141,7 +156,7 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
           </section>
         ) : filteredAlumni.length > 0 ? (
           <section className={styles.cardsGrid}>
-            {filteredAlumni.map((alumnus) => (
+            {pagedAlumni.map((alumnus) => (
               <AlumniCard
                 key={alumnus.id}
                 data={alumnus}
@@ -171,6 +186,27 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
             </button>
           </div>
         )}
+        <div className={styles.pagination}>
+          <button
+            className={styles.pageBtn}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Anterior
+          </button>
+
+          <span className={styles.pageInfo}>
+            Página <strong>{page}</strong> de <strong>{totalPages}</strong>
+          </span>
+
+          <button
+            className={styles.pageBtn}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Próxima
+          </button>
+        </div>
       </main>
       {/* Modal de Detalhes */}
       {selectedAlumni && (
