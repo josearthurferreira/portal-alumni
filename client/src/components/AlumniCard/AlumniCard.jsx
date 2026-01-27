@@ -7,7 +7,7 @@ const AlumniCard = ({ data, onClick }) => {
     <div className={styles.card} onClick={() => onClick(data)}>
       <img src={data.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName)}&background=random`} alt={data.nome} className={styles.profilePic} />
       <h3>{data.fullName}</h3>
-      <p><GraduationCap size={16} /> {data.course}</p>
+      <span className={styles.course}><GraduationCap  className={styles.gradicon} size={16} /> {data.course}</span>
       <p><Calendar size={16} /> Turma de {data.graduationYear}</p>
       <p><MapPin size={16} /> {data.city}, {data.state}</p>
       <p><Building size={16} /> {data.company || 'Autônomo'}</p>
