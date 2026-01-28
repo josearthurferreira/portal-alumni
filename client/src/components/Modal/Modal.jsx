@@ -33,7 +33,7 @@ const Modal = ({ data, onClose }) => {
               <h3><User size={18} /> Informações Acadêmicas</h3>
               <ul>
                 <li>
-                  <GraduationCap size={16} /> {data.course} • Turma de {data.graduationYear}
+                  <GraduationCap  size={16} /> {data.course} • Turma de {data.graduationYear}
                 </li>
                 <li>
                   <MapPin size={16} /> {data.city || 'Cidade não informada'}{data.state ? `, ${data.state}` : ''}
