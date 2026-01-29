@@ -26,7 +26,7 @@ const Header = ({
           <div className={styles.logoWrapper}>
             <img src={localImage} alt="Logo alumni" width={80} height={100} />
           </div>
-          <div className={styles.titleAlum}>Alumni</div>
+          <div className={styles.titleAlum}>ALUMNI</div>
           
         </h1>
 

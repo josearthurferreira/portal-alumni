@@ -112,10 +112,10 @@
 }
 
 .titleAlum {
-  margin-top: 0.4rem;
-  font-family: 'Open Sans', Arial, sans-serif;
-  font-size: 1.8rem;
-  font-weight: 800;
+  margin-top: 0.6rem;
+  /* font-family: 'Open Sans', Arial, sans-serif; */
+  font-size: 1.6rem;
+  font-weight: 400;
 }
 
 .logoWrapper {
@@ -134,8 +134,8 @@
   }
   .titleLogo img {
     width: 70px;
-    height: 90px;
-    margin-right: 12px;
+    height: 60px;
+    margin-right: 8px;
   }
 }
 
@@ -148,9 +148,6 @@
   }
   .titleLogo img {
     width: 40px;
-    height: 60px;
-  }
-  .logoWrapper {
-    left: 2rem;
+    height: 50px;
   }
 }
