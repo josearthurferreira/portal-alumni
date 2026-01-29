@@ -24,7 +24,8 @@ const DEFAULT_COURSES = [
   'Engenharia de Materiais',
   'Engenharia Elétrica',
   'Engenharia Eletrônica',
-  'Engenharia Mecânica',
+  'Engenharia Mecânica e de Automóveis',
+  'Engenharia Mecânica e de Armamentos',
   'Engenharia Química',
 ];
 
@@ -269,11 +270,11 @@ export default function AddAlumniModal({
             skills: Array.isArray(p.skills)
               ? p.skills
               : typeof p.skills === 'string' && p.skills.trim()
-              ? p.skills
+                ? p.skills
                   .split(',')
                   .map((s) => s.trim())
                   .filter(Boolean)
-              : [],
+                : [],
           }));
         } catch (err) {
           if (err?.response?.status === 404) {
@@ -712,8 +713,8 @@ export default function AddAlumniModal({
                         {!form.countryIso2
                           ? 'Primeiro selecione o país'
                           : loadingStates
-                          ? 'Carregando estados...'
-                          : 'Selecione o estado'}
+                            ? 'Carregando estados...'
+                            : 'Selecione o estado'}
                       </option>
 
                       {states.map((s) => (
@@ -746,17 +747,17 @@ export default function AddAlumniModal({
                           {!form.countryIso2
                             ? 'Selecione o país'
                             : !form.stateUf
-                            ? 'Selecione o estado'
-                            : loadingCities
-                            ? 'Carregando cidades...'
-                            : 'Selecione a cidade'}
+                              ? 'Selecione o estado'
+                              : loadingCities
+                                ? 'Carregando cidades...'
+                                : 'Selecione a cidade'}
                         </option>
 
                         {/* fallback se a cidade salva não estiver na lista */}
                         {form.city &&
-                        !loadingCities &&
-                        Array.isArray(cities) &&
-                        !cities.includes(String(form.city).trim()) ? (
+                          !loadingCities &&
+                          Array.isArray(cities) &&
+                          !cities.includes(String(form.city).trim()) ? (
                           <option value={String(form.city).trim()}>
                             {String(form.city).trim()} (salvo)
                           </option>
@@ -995,8 +996,8 @@ export default function AddAlumniModal({
                   ? 'Salvando...'
                   : 'Adicionando...'
                 : isEditing
-                ? 'Salvar Alterações'
-                : 'Adicionar Perfil'}
+                  ? 'Salvar Alterações'
+                  : 'Adicionar Perfil'}
             </button>
           </footer>
         </form>
