@@ -1,22 +1,29 @@
 .header {
-  background-color: #121a36; /* Azul escuro oficial */
-  padding: 1rem 2rem;
-  border-bottom: 2px solid #cc4b00; /* Linha laranja de detalhe */
+  background-color: #121a36;
+  position: relative;
+  /* padding: 1rem 2rem; */
+  /* border-bottom: 2px solid #cc4b00;  */
   width: 100%;
 }
 
 .headerContent {
-  max-width: 1200px;
+  background-color: #121a36;
+  padding: 1rem 2rem;
+  height: 5rem;
+  max-width: 1540px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 
-.logo {
+.titleLogo {
+  display: flex;
+  justify-content: center;
+
+  align-items: flex-start;
+  gap: 1rem;
   color: #ffffff; /* Texto branco para contraste */
-  font-size: 1.8rem;
-  font-weight: 800;
   cursor: pointer;
   margin: 0;
   letter-spacing: -1px;
@@ -26,9 +33,9 @@
 .loginBtn {
   background-color: transparent;
   color: #ffffff;
-  border: 2px solid #ffffff;
+  border: 2px solid #b5a375 !important;
   padding: 0.6rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 20px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -44,12 +51,12 @@
   background-color: #cc4b00;
   color: white;
   border: none;
-  padding: 0.7rem 1.2rem;
-  border-radius: 8px;
+  padding: 0.7rem 0.7rem;
+  border-radius: 20px;
   font-weight: bold;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.2rem;
   cursor: pointer;
   transition: transform 0.2s;
 }
@@ -69,8 +76,8 @@
   background-color: transparent;
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 0.7rem 1.2rem;
-  border-radius: 8px;
+  padding: 0.7rem 0.7rem;
+  border-radius: 20px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -82,4 +89,68 @@
 .logoutBtn:hover {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: #ffffff;
+}
+
+.subtitle {
+  display: flex;
+
+  padding: 10px 0;
+  color: #b5a375;
+  /* color: #ffffff; */
+  font-size: 40px;
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 500;
+  line-height: 1.55;
+  background-position: center center;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(28, 33, 67, 0.1),
+    rgba(250, 105, 19, 0.6)
+  );
+  background-position: 2%;
+  justify-content: center;
+}
+
+.titleAlum {
+  margin-top: 0.4rem;
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.logoWrapper {
+  margin-right: 12px;
+
+  transform: translateY(10%);
+  z-index: 10;
+}
+
+@media (max-width: 900px) {
+  .titleLogo {
+    font-size: 0rem;
+  }
+  .subtitle {
+    font-size: 2rem;
+  }
+  .titleLogo img {
+    width: 70px;
+    height: 90px;
+    margin-right: 12px;
+  }
+}
+
+@media (max-width: 700px) {
+  .titleAlum {
+    font-size: 0rem;
+  }
+  .subtitle {
+    font-size: 1.4rem;
+  }
+  .titleLogo img {
+    width: 40px;
+    height: 60px;
+  }
+  .logoWrapper {
+    left: 2rem;
+  }
 }
