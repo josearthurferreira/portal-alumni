@@ -29,7 +29,7 @@
 .slogan {
   font-size: 1rem;
   color: #cbd5e1; /* Branco levemente acinzentado */
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.5rem 0;
 }
 
 .legalInfo {
@@ -51,7 +51,7 @@
 .socialIcons {
   display: flex;
   gap: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
 }
 
 .iconCircle {
@@ -68,7 +68,7 @@
 
 .iconCircle:hover {
   transform: translateY(-2px);
-  background-color: #f0f0f0;
+  background-color: #d4a017;
 }
 
 .legalLink {
@@ -84,6 +84,15 @@
 
 /* Responsividade para telas menores */
 @media (max-width: 768px) {
+  .title {
+    font-size: 1rem;
+  }
+  .slogan {
+    font-size: 0.8rem;
+  }
+  .legalInfo{
+    font-size: 0.7rem;
+  }
   .container {
     flex-direction: column;
     align-items: center;
