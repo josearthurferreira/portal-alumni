@@ -11,7 +11,6 @@
   margin: 0 auto;
   padding: 2rem 0;
   flex: 1; /* Faz o conteúdo crescer para empurrar o footer */
-  
 }
 
 
@@ -27,6 +26,7 @@
   color: #e9ebf7;
   margin-bottom: 2rem;
   font-size: 1rem;
+  margin-left: 1rem;
 }
 
 .noResults {
@@ -187,7 +187,7 @@
    DIVISOR DO FOOTER
 --------------------------------- */
 .footerDivider {
-  margin: 3rem 0 0; /* <-- corrigido */
+  margin: 1rem 0 0; /* <-- corrigido */
   height: 3px;
   width: 100%;
   background: linear-gradient(

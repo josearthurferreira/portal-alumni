@@ -40,7 +40,7 @@ const SearchBar = ({
         value={selectedAno}
         onChange={(e) => onAnoChange(e.target.value)}
       >
-        <option value="">Todos os Anos <Calendar size={20}/></option>
+        <option value="">Todos os Anos</option>
         {anos.map(ano => (
           <option key={ano} value={ano}>{ano}</option>
         ))}

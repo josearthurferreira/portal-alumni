@@ -10,7 +10,7 @@ body {
   padding: 0;
   min-width: 100vw; /* Garante que o corpo tenha a largura da tela */
   min-height: 100vh;
-  background-color: #121a36; /* Cor do seu fundo para não ficar branco nas bordas */
+  background: #121a36; /* Cor do seu fundo para não ficar branco nas bordas */
 }
 
 #root {
