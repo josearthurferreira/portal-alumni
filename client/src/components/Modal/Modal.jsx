@@ -1,12 +1,36 @@
 import React from 'react';
-import { X, GraduationCap, MapPin, Briefcase, Mail, Linkedin, User } from 'lucide-react';
+import {
+  X,
+  GraduationCap,
+  MapPin,
+  Briefcase,
+  Mail,
+  Linkedin,
+  User,
+} from 'lucide-react';
 import styles from './Modal.module.css';
 
 const Modal = ({ data, onClose }) => {
   if (!data) return null;
+  //Fix do Não informar cargo
+  const isMeaningful = (v) => v && v !== 'Prefiro não informar';
+
+  const roleText = isMeaningful(data.role) ? data.role : null;
+  const companyText = isMeaningful(data.company) ? data.company : null;
+
+  const headline =
+    roleText && companyText
+      ? `${roleText} na ${companyText}`
+      : companyText
+        ? companyText
+        : roleText
+          ? roleText
+          : 'Ex-aluno';
 
   // Fallback para imagem caso profilePicture seja nulo
-  const avatarUrl = data.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName)}&background=random`;
+  const avatarUrl =
+    data.profilePicture ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName)}&background=random`;
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -19,9 +43,7 @@ const Modal = ({ data, onClose }) => {
           <img src={avatarUrl} alt={data.fullName} className={styles.avatar} />
           <div className={styles.titleInfo}>
             <h1>{data.fullName}</h1>
-            <p className={styles.headline}>
-              {data.role || 'Ex-aluno'} {data.company ? `na ${data.company}` : ''}
-            </p>
+            <p className={styles.headline}>{headline}</p>
           </div>
         </header>
 
@@ -32,13 +54,18 @@ const Modal = ({ data, onClose }) => {
               <h3> Informações Acadêmicas</h3>
               <ul>
                 <li>
-                  <GraduationCap  size={16} /> {data.course} • Turma de {data.graduationYear}
+                  <GraduationCap size={16} /> {data.course} • Turma de{' '}
+                  {data.graduationYear}
                 </li>
                 <li>
-                  <MapPin size={16} /> {data.city || 'Cidade não informada'}{data.state ? `, ${data.state}` : ''}
+                  <MapPin size={16} /> {data.city || 'Cidade não informada'}
+                  {data.state ? `, ${data.state}` : ''}
                 </li>
                 <li>
-                  <Briefcase size={16} /> {data.yearsOfExperience ? `${data.yearsOfExperience} anos de experiência` : 'Experiência não informada'}
+                  <Briefcase size={16} />{' '}
+                  {data.yearsOfExperience
+                    ? `${data.yearsOfExperience} anos de experiência`
+                    : 'Experiência não informada'}
                 </li>
               </ul>
             </section>
@@ -55,10 +82,14 @@ const Modal = ({ data, onClose }) => {
               <div className={styles.tags}>
                 {data.skills && data.skills.length > 0 ? (
                   data.skills.map((skill, index) => (
-                    <span key={index} className={styles.tag}>{skill}</span>
+                    <span key={index} className={styles.tag}>
+                      {skill}
+                    </span>
                   ))
                 ) : (
-                  <span className={styles.noSkills}>Nenhuma habilidade listada</span>
+                  <span className={styles.noSkills}>
+                    Nenhuma habilidade listada
+                  </span>
                 )}
               </div>
             </section>
@@ -69,16 +100,27 @@ const Modal = ({ data, onClose }) => {
             <section>
               <h3>Contato</h3>
               <div className={styles.contactItem}>
-                <div className={styles.iconBox}><Mail size={16} /></div>
-                <div><span>Email</span><p>{data.email}</p></div>
+                <div className={styles.iconBox}>
+                  <Mail size={16} />
+                </div>
+                <div>
+                  <span>Email</span>
+                  <p>{data.email}</p>
+                </div>
               </div>
               {data.linkedinUrl && (
                 <div className={styles.contactItem}>
-                  <div className={styles.iconBox}><Linkedin size={16} /></div>
+                  <div className={styles.iconBox}>
+                    <Linkedin size={16} />
+                  </div>
                   <div>
                     <span>LinkedIn</span>
                     <p>
-                      <a href={data.linkedinUrl} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={data.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         Ver Perfil
                       </a>
                     </p>
@@ -90,12 +132,22 @@ const Modal = ({ data, onClose }) => {
             <section>
               <h3>Atuação Profissional</h3>
               <div className={styles.contactItem}>
-                <div className={styles.iconBox}><Briefcase size={16} /></div>
-                <div><span>Empresa</span><p>{data.company || 'Não informado'}</p></div>
+                <div className={styles.iconBox}>
+                  <Briefcase size={16} />
+                </div>
+                <div>
+                  <span>Empresa</span>
+                  <p>{data.company || 'Não informado'}</p>
+                </div>
               </div>
               <div className={styles.contactItem}>
-                <div className={styles.iconBox}><Briefcase size={16} /></div>
-                <div><span>Cargo</span><p>{data.role || 'Não informado'}</p></div>
+                <div className={styles.iconBox}>
+                  <Briefcase size={16} />
+                </div>
+                <div>
+                  <span>Cargo</span>
+                  <p>{roleText || 'Não informado'}</p>
+                </div>
               </div>
             </section>
           </div>
