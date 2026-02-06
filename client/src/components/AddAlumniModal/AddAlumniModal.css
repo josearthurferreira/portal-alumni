@@ -82,7 +82,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   padding: 0;
-  padding-bottom: 4px;
+  /*padding-bottom: 4px;*/
   line-height: 1;
 }
 
@@ -131,7 +131,7 @@
   background-position: center;
   background-repeat: no-repeat;
   filter: blur(4px);
-  z-index: -1; 
+  z-index: -1;
   opacity: 0.5;
 }
 
@@ -452,7 +452,7 @@
   align-items: center;
 }
 
-.dateRow input{
+.dateRow input {
   border-radius: 0px 0px 0px 20px;
 }
 
@@ -477,7 +477,6 @@
   pointer-events: none;
   width: 0;
   height: 0;
-
 }
 
 /* só mostra erro depois de tentar enviar */
