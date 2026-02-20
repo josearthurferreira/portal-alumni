@@ -106,6 +106,10 @@ ul li svg {
   text-align: justify;
 }
 
+.noSkills{
+  color: #475569
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;

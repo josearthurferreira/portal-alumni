@@ -88,7 +88,7 @@ const Modal = ({ data, onClose }) => {
                   ))
                 ) : (
                   <span className={styles.noSkills}>
-                    Nenhuma habilidade listada
+                    Nenhuma habilidade listada.
                   </span>
                 )}
               </div>

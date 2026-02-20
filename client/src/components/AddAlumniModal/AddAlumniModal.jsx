@@ -108,7 +108,7 @@ const DEFAULT_ROLE_GROUPS = [
     ],
   },
   {
-    label: 'Carreira Académica',
+    label: 'Carreira Acadêmica',
     options: [
       'Iniciação Científica',
       'Mestrando',
