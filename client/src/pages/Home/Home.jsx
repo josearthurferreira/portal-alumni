@@ -49,12 +49,16 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
 
     try {
       const response = await getAlumni(filters);
-      setAlumni(response.data);
+      const dataArray = Array.isArray(response.data) ? response.data : [];
+
+      setAlumni(dataArray);
 
       if (Object.keys(filters).length === 0) {
-        setFilterOptions(response.data);
+        setFilterOptions(dataArray);
       }
     } catch (err) {
+      setAlumni([]);
+      setFilterOptions([]);
       const msg = err.response?.data?.message || 'Erro ao carregar dados.';
       setErrorMessage(msg);
     } finally {
