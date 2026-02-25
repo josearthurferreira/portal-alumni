@@ -24,9 +24,9 @@ const Header = ({
     { src: 'https://alumniime.com.br/', label: 'ASSOCIAÇÃO' },
     { src: 'https://alumniime.com.br/eventos', label: 'EVENTOS' },
     { src: 'https://alumniime.com.br/projetos', label: 'PROJETOS' },
-    { src: 'http://localhost:5173/', label: 'PORTAL DE ALUNOS' },
+    { src: '#', label: 'PORTAL DE ALUNOS' },
     { src: 'https://www.reserva.ink/alumniime#', label: 'LOJA ALUMNIIME' },
-    { src: 'https://alumniime.com.br/', label: 'VAGAS' },
+    { src: 'https://alumniime.com.br/pesquisa-de-vagas', label: 'VAGAS' },
     { src: 'https://alumniime.com.br/transparencia', label: 'TRANSPARÊNCIA' },
     { src: 'https://alumniime.com.br/doe', label: 'DOAR' },
   ];
