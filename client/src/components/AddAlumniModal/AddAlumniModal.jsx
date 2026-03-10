@@ -1530,7 +1530,7 @@ export default function AddAlumniModal({
     );
     setCustomFieldError(birthInputRef, 'birthDate', birthMsg);
 
-    const gradMsg = validateGraduationYear(form.graduationYear);
+    const gradMsg = validateGraduationYear(form.brithDate, form.graduationYear);
     setCustomFieldError(gradYearInputRef, 'graduationYear', gradMsg);
 
     const phoneMsg = validatePhone(form.phone);

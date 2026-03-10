@@ -102,7 +102,9 @@ export function validateBirthDate(br, minIso, maxIso) {
 
 /* ------------------ Ano de formatura ------------------ */
 
-export function validateGraduationYear(yearRaw) {
+export function validateGraduationYear(br, yearRaw) {
+  const v = (br || '').trim();
+
   const value = String(yearRaw || '').trim();
   if (!value) return ''; // required do browser já cuida
 
@@ -113,6 +115,10 @@ export function validateGraduationYear(yearRaw) {
 
   // Não dá pra “já ter se formado” em ano futuro
   if (year > currentYear) {
+    return `Ano de formatura deve ser antes que ${currentYear}.`;
+  }
+
+  if (year < br) {
     return `Ano de formatura deve ser antes que ${currentYear}.`;
   }
 
