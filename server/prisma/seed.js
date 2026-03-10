@@ -4,6 +4,9 @@ const { faker } = require('@faker-js/faker');
 const prisma = new PrismaClient();
 
 async function main() {
+  console.log('--- 🧹 Limpando banco de dados ---');
+  await prisma.alumnus.deleteMany();
+
   console.log('🚀 Iniciando o Stress Test: Preparando 6.000 Ex-Alunos...');
 
   const totalUsers = 6000;
@@ -40,7 +43,7 @@ async function main() {
         country: 'Brasil',
         state: faker.location.state(),
         city: faker.location.city(),
-        course: faker.helpers.arrayElement(['Ciência da Computação', 'Engenharia de Software', 'Matemática Aplicada', 'Sistemas de Informação']),
+        course: faker.helpers.arrayElement(['Engenharia Cartográfica', 'Engenharia da Computação', 'Engenharia de Comunicações', 'Engenharia de Fortificação e Construção', 'Engenharia de Materiais', 'Engenharia Elétrica', 'Engenharia Eletrônica', 'Engenharia Mecânica e de Automóveis', 'Engenharia Mecânica e de Armamentos', 'Engenharia Química']),
         graduationYear: faker.number.int({ min: 1980, max: 2024 }),
         company: faker.company.name(),
         role: faker.person.jobTitle(),
@@ -56,7 +59,7 @@ async function main() {
       prisma.alumnus.createMany({ data: alumniBatch })
     ]);
 
-    console.log(`✅ Lote ${batch + 1} concluído: ${ (batch + 1) * batchSize } usuários criados...`);
+    console.log(`✅ Lote ${batch + 1} concluído: ${(batch + 1) * batchSize} usuários criados...`);
   }
 
   console.log('🎉 Fim! O banco de dados acaba de receber 6.000 usuários com sucesso!');
