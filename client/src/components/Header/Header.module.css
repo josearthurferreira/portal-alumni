@@ -35,9 +35,10 @@
   flex-direction: row;
   justify-content: space-between;
   gap: 10px;
-  align-items: center;
+  padding: 2px;
+  /* margin-top: 10px; */
+  align-items: self-start;
   width: 100%;
-  margin-top: 10px;
 }
 
 .linkPortal {
@@ -47,6 +48,8 @@
   cursor: pointer;
   border-bottom: 1px solid transparent;
   transition: border-color 0.3s ease;
+  margin-top: 16px;
+  /* width: 120%; */
 }
 
 .links {
@@ -56,6 +59,7 @@
   cursor: pointer;
   border-bottom: 1px solid transparent;
   transition: border-color 0.3s ease;
+  margin-top: 16px;
 
 }
 
@@ -94,6 +98,7 @@
   min-width: 90px;
   justify-content: center;
   height: auto;
+  margin-top: 4px;
 }
 
 .loginBtn:hover {
@@ -195,17 +200,73 @@
   color: #b5a375;
   cursor: pointer;
   z-index: 1001;
-  margin-top: 20px;
-  margin-right: 3px;
+  margin-top: 10px;
 }
 
 @media (max-width: 1024px) {
   .menuMobileIcon {
     display: block;
-    margin-top: 22px;
   }
-  .headerContent {
-    padding: 12px 10px;
+  .titleLogo img {
+    width: 70px;
+    height: 80px;
+    margin-right: 8px;
+  }
+
+  .linksContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 5rem;
+    left: 0;
+    background-color: #121a36;
+    gap: 0px;
+    z-index: 1000;
+    border-bottom: 2px solid #b5a375;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+
+    opacity: 0;
+    overflow: hidden;
+    transition:
+      max-height 500ms ease-in-out,
+      opacity 300ms ease-in-out,
+      padding 300ms ease-in-out;
+  }
+
+  .linksContainer.open {
+    display: flex;
+    justify-content: center;
+    max-height: 500px;
+    opacity: 1;
+    padding: 2rem;
+    align-items: center;
+  }
+
+  .linkPortal,
+  .links {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .actions {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    gap: 0.5rem;
+    flex-direction: column;
+  }
+  .addBtn,
+  .loginBtn,
+  .logoutBtn {
+    font-size: 14px;
+    padding: 0.6rem 1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .titleLogo {
+    font-size: 0rem;
   }
 
   .linksContainer {
@@ -294,6 +355,10 @@
     text-align: center;
     padding: 0px 20px;
   }
+  .titleLogo img {
+    width: 50px;
+    height: 60px;
+  }
   .logoWrapper {
     transform: translateY(0%);
   }
@@ -311,6 +376,16 @@
   }
   .headerContent {
     padding: 20px;
+  }
+
+  .loginBtn,
+  .addBtn,
+  .logoutBtn {
+    font-size: 14px;
+    padding: 0.6rem 1.6rem;
+  }
+  .headerContent {
+    padding: 1rem;
   }
 
   .loginBtn,

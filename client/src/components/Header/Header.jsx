@@ -24,7 +24,6 @@ const Header = ({
     { src: 'https://alumniime.com.br/', label: 'ASSOCIAÇÃO' },
     { src: 'https://alumniime.com.br/eventos', label: 'EVENTOS' },
     { src: 'https://alumniime.com.br/projetos', label: 'PROJETOS' },
-    { src: 'https://doador.doare.org/login', label: 'ENTRAR' },
     { src: '#', label: 'PORTAL DE ALUNOS' },
     { src: 'https://www.reserva.ink/alumniime#', label: 'LOJA ALUMNIIME' },
     { src: 'https://alumniime.com.br/pesquisa-de-vagas', label: 'VAGAS' },
@@ -46,7 +45,7 @@ const Header = ({
 
         {/* Botão visível apenas no Mobile */}
         <button className={styles.menuMobileIcon} onClick={toggleMenu}>
-          {isMenuOpen ? <X size={36} /> : <Menu size={36} />}
+          {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
 
         {/* Links - Classe condicional para abrir/fechar no mobile */}
