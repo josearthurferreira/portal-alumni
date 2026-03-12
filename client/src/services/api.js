@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'http://localhost:3001/api',
 });
 
 // Interceptor do Token
@@ -18,6 +18,7 @@ export const getAlumni = (filters = {}) => {
   );
   return api.get('/alumni', { params: cleanFilters });
 };
+export const getFilters = () => api.get('/alumni/filters');
 
 // Auth
 export const register = (payload) => api.post('/auth/register', payload);
@@ -31,5 +32,7 @@ export const getMyProfile = () => api.get('/me/profile');
 // Recebe o formData pronto do Modal e apenas envia.
 // O Axios percebe que é FormData e configura o Content-Type sozinho.
 export const upsertMyProfile = (formData) => api.put('/me/profile', formData);
+
+
 
 export default api;

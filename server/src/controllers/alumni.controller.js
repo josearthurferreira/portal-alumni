@@ -3,7 +3,8 @@ const prisma = require('../database/prisma');
 // --- LISTAGEM ---
 const listAlumni = async (req, res, next) => {
   try {
-    const { course, graduationYear, city, role } = req.query;
+    // 1. Recebemos page e limit (com valores padrão para a página 1 e 8 itens)
+    const { course, graduationYear, city, role, page = 1, limit = 8, fullName } = req.query;
 
     const where = {};
     if (course) where.course = course;
@@ -11,12 +12,52 @@ const listAlumni = async (req, res, next) => {
     if (role) where.role = role;
     if (city) where.city = { contains: city, mode: 'insensitive' };
 
-    const alumni = await prisma.alumnus.findMany({
-      where,
-      orderBy: { fullName: 'asc' },
-    });
+    if (fullName) where.fullName = { contains: String(fullName), mode: 'insensitive' };
 
-    return res.status(200).json(alumni);
+    // 2. Calculamos quantos itens pular (skip) e quantos pegar (take)
+    const skip = (Number(page) - 1) * Number(limit);
+    const take = Number(limit);
+
+    // 3. Executamos a busca e a contagem simultaneamente (muito mais rápido)
+    const [alumni, totalCount] = await Promise.all([
+      prisma.alumnus.findMany({
+        where,
+        orderBy: [{ fullName: 'asc' }, { id: 'asc' }],
+        skip,
+        take,
+      }),
+      prisma.alumnus.count({ where }) // Conta o total de registros com esse filtro
+    ]);
+
+    // 4. Retornamos os dados junto com os metadados de paginação
+    return res.status(200).json({
+      data: alumni,
+      meta: {
+        total: totalCount,
+        page: Number(page),
+        limit: take,
+        totalPages: Math.ceil(totalCount / take)
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getFilterOptions = async (req, res, next) => {
+  try {
+    // Buscamos apenas os valores distintos de cada coluna
+    const [courses, roles, years] = await Promise.all([
+      prisma.alumnus.findMany({ select: { course: true }, distinct: ['course'] }),
+      prisma.alumnus.findMany({ select: { role: true }, distinct: ['role'] }),
+      prisma.alumnus.findMany({ select: { graduationYear: true }, distinct: ['graduationYear'] }),
+    ]);
+
+    res.json({
+      courses: courses.map(c => c.course).filter(Boolean).sort(),
+      roles: roles.map(r => r.role).filter(Boolean).sort(),
+      years: years.map(y => y.graduationYear).filter(Boolean).sort((a, b) => b - a),
+    });
   } catch (error) {
     next(error);
   }
@@ -46,4 +87,5 @@ const createAlumnus = async (req, res, next) => {
 module.exports = {
   listAlumni,
   createAlumnus,
+  getFilterOptions,
 };
