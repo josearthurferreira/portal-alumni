@@ -44,22 +44,28 @@ const listAlumni = async (req, res, next) => {
   }
 };
 
-const getFilterOptions = async (req, res, next) => {
+// server/src/controllers/alumni.controller.js
+
+const getFilterOptions = async (req, res) => {
   try {
-    // Buscamos apenas os valores distintos de cada coluna
-    const [courses, roles, years] = await Promise.all([
-      prisma.alumnus.findMany({ select: { course: true }, distinct: ['course'] }),
-      prisma.alumnus.findMany({ select: { role: true }, distinct: ['role'] }),
-      prisma.alumnus.findMany({ select: { graduationYear: true }, distinct: ['graduationYear'] }),
-    ]);
+    const coursesData = await prisma.alumnus.findMany({
+      select: { course: true },
+      distinct: ['course'],
+    });
+
+    const yearsData = await prisma.alumnus.findMany({
+      select: { graduationYear: true },
+      distinct: ['graduationYear'],
+    });
 
     res.json({
-      courses: courses.map(c => c.course).filter(Boolean).sort(),
-      roles: roles.map(r => r.role).filter(Boolean).sort(),
-      years: years.map(y => y.graduationYear).filter(Boolean).sort((a, b) => b - a),
+      courses: coursesData.map(c => c.course).filter(Boolean).sort(),
+      years: yearsData.map(y => y.graduationYear).filter(Boolean).sort((a, b) => b - a),
+      roles: []
     });
   } catch (error) {
-    next(error);
+    console.error("Erro no Prisma:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
   }
 };
 
