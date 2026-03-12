@@ -186,7 +186,7 @@
   font-weight: 800;
 }
 
-.logoWrapper {
+.logoWrapper img {
   margin-right: 12px;
   width:70px;
   transform: translateY(10%);
@@ -200,17 +200,33 @@
   color: #b5a375;
   cursor: pointer;
   z-index: 1001;
-  margin-top: 10px;
+  margin-top: 6px;
+  margin-right: -6px;
 }
+.closeMenuMob{
+  width: 38px;
+  height: 60px;
+}
+.toogleMenuMob{
+  width: 38px;
+  height: 60px; 
+  transform: scaleY(0.7);
+}
+
 
 @media (max-width: 1024px) {
   .menuMobileIcon {
     display: block;
   }
+
+  .closeMenuMob{
+    width: 38px;
+    height: 60px;
+  }
   .titleLogo img {
     width: 70px;
-    height: 80px;
-    margin-right: 8px;
+    margin-top: 4px;
+    margin-right: 6px;
   }
 
   .linksContainer {
@@ -219,7 +235,7 @@
     justify-content: center;
     align-items: center;
     position: absolute;
-    top: 5rem;
+    top: 4rem;
     left: 0;
     background-color: #121a36;
     gap: 0px;
@@ -245,10 +261,11 @@
     justify-content: center;
     max-height: 500px;
     opacity: 1;
-    padding: 2rem;
+    padding: 1rem;
     pointer-events: auto;
     visibility: visible;
     align-items: center;
+    gap:3px;
   }
 
   .linkPortal,
@@ -281,6 +298,9 @@
 }
 
 @media (max-width: 700px) {
+  .headerContent {
+    padding: 1rem 1.2rem;
+  }
   .titleAlum {
     font-size: 0rem;
   }
@@ -289,10 +309,6 @@
     width: 100%;
     text-align: center;
     padding: 0px 20px;
-  }
-  .titleLogo img {
-    width: 50px;
-    height: 60px;
   }
   .logoWrapper {
     transform: translateY(0%);
