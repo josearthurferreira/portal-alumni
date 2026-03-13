@@ -1514,7 +1514,7 @@ export default function AddAlumniModal({
   }
 
   function validateLinkedinUrl(value) {
-    if (!value.trim()) return '';
+    if (!value?.trim()) return '';
     const isValid =
       /^https?:\/\/(www\.)?linkedin\.com\/(in|company|school)\/[^\s/]+/i.test(
         value.trim(),
@@ -1530,7 +1530,7 @@ export default function AddAlumniModal({
     );
     setCustomFieldError(birthInputRef, 'birthDate', birthMsg);
 
-    const gradMsg = validateGraduationYear(form.brithDate, form.graduationYear);
+    const gradMsg = validateGraduationYear(form.birthDate, form.graduationYear);
     setCustomFieldError(gradYearInputRef, 'graduationYear', gradMsg);
 
     const phoneMsg = validatePhone(form.phone);
@@ -1874,7 +1874,7 @@ export default function AddAlumniModal({
                     setExtraErrors((prev) => ({ ...prev, graduationYear: '' }));
                   }}
                   onBlur={() => {
-                    const msg = validateGraduationYear(form.graduationYear);
+                    const msg = validateGraduationYear(form.graduationYear, form.graduationYear);
                     setCustomFieldError(
                       gradYearInputRef,
                       'graduationYear',
