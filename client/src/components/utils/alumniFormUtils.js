@@ -103,9 +103,7 @@ export function validateBirthDate(br, minIso, maxIso) {
 /* ------------------ Ano de formatura ------------------ */
 
 export function validateGraduationYear(br, yearRaw) {
-  const v = (br || '').trim();
-
-  const value = String(yearRaw || '').trim();
+  const value = String(yearRaw||'').trim();
   if (!value) return ''; // required do browser já cuida
 
   if (!/^\d{4}$/.test(value)) return 'Digite um ano válido com 4 dígitos.';
@@ -114,17 +112,36 @@ export function validateGraduationYear(br, yearRaw) {
   const currentYear = new Date().getFullYear();
 
   // Não dá pra “já ter se formado” em ano futuro
-  if (year > currentYear) {
-    return `Ano de formatura deve ser antes que ${currentYear}.`;
-  }
+  if (year > currentYear+4) {
+    return `Ano de formatura deve ser antes que ${currentYear+4}.`;
+	  }
 
   if (year < br) {
-    return `Ano de formatura deve ser antes que ${currentYear}.`;
+    return `Ano de formatura deve ser depois que nascimento.`;
   }
 
   // sanity (opcional, mas bom)
   if (year < 1900) {
     return 'Ano de formatura muito antigo. Verifique.';
+  }
+
+  const brLimpo = String(br || '').trim();
+
+  if (brLimpo.length >= 4) {
+    const birthYear = Number(brLimpo.slice(-4));
+
+    // Se a extração deu certo e é um número válido
+    if (!isNaN(birthYear) && birthYear > 0) {
+      // Regra principal: Formatura tem que ser DEPOIS do nascimento
+      if (year <= birthYear) {
+        return `O ano de formatura (${graduationYear}) deve ser maior que o ano de nascimento (${birthYear}).`;
+      }
+
+      // Ninguém se forma na faculdade com menos de ~13 anos de idade.
+      if (year - birthYear < 13) {
+        return 'Verifique as datas: a idade de formatura parece incorreta.';
+      }
+    }
   }
 
   return '';
