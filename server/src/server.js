@@ -64,6 +64,7 @@ app.use(express.json());
 app.use(logger);
 
 // --- 6. ROTAS ---
+// --- 6. ROTAS ---
 app.use('/alumni', alumniRoutes);
 app.use('/auth', authRoutes);
 app.use('/me', meRoutes);

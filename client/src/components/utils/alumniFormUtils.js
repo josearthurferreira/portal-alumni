@@ -103,31 +103,44 @@ export function validateBirthDate(br, minIso, maxIso) {
 /* ------------------ Ano de formatura ------------------ */
 
 export function validateGraduationYear(br, yearRaw) {
-  const v = (br || '').trim();
-  const birthYear = new Date(v).getFullYear();
-  const graduationYear = parseInt(yearRaw, 10);
-
   const value = String(yearRaw || '').trim();
   if (!value) return ''; // required do browser já cuida
 
   if (!/^\d{4}$/.test(value)) return 'Digite um ano válido com 4 dígitos.';
-  const year = Number(value);
 
+  const year = Number(value);
   const currentYear = new Date().getFullYear();
 
-  if (birthYear > graduationYear){
-    return `Ano da formatura ${graduationYear} não pode anteceder ano de nascimento ${birthYear}!`;
-  }
-  if (birthYear < 1960){
-    return `Ano da formatura ${graduationYear} não pode ser inferior a 1960!`;
-  }
-  if (graduationYear > currentYear+4){
-    return `Ano da formatura ${graduationYear} não pode maior que ${currentYear+4}!`;
-  }
-  if (graduationYear - birthYear < 21){
-    return `Ano da formatura ${graduationYear} tem que ser pelo menos maior que ${birthYear+21}!`;
+  // Valida limite no futuro (+4 anos)
+  if (year > currentYear + 4) {
+    return `Ano de formatura deve ser até ${currentYear + 4}.`;
   }
 
+  // Sanity check de passado distante
+  if (year < 1900) {
+    return 'Ano de formatura muito antigo. Verifique.';
+  }
+
+  // --- Validação com a Data de Nascimento ---
+  const brLimpo = String(br || '').trim();
+
+  if (brLimpo.length >= 4) {
+    // Extrai só os 4 últimos dígitos de "dd/mm/aaaa"
+    const birthYear = Number(brLimpo.slice(-4));
+
+    // Se a extração deu certo e é um número válido
+    if (!isNaN(birthYear) && birthYear > 0) {
+      if (year <= birthYear) {
+        return `O ano de formatura (${year}) deve ser maior que o ano de nascimento (${birthYear}).`;
+      }
+      // Ninguém se forma na faculdade com menos de ~13 anos de idade.
+      if (year - birthYear < 13) {
+        return 'Verifique as datas: a idade na formatura parece incorreta.';
+      }
+    }
+  }
+
+  // Se passou por todos os "ifs" sem dar erro, retorna vazio (Sucesso!)
   return '';
 }
 
