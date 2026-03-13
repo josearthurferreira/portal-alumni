@@ -24,27 +24,27 @@ const Footer = () => {
               className={styles.iconCircle}
             >
               {/* LinkedIn e Facebook ficam bons com fill para parecerem sólidos */}
-              <Linkedin size={26} fill="currentColor" strokeWidth={0} />
+              <Linkedin size={23} fill="currentColor" strokeWidth={0} />
             </a>
             <a
               href="https://www.facebook.com/AlumniIME"
               className={styles.iconCircle}
             >
-              <Facebook size={26} fill="currentColor" strokeWidth={0} />
+              <Facebook size={23} fill="currentColor" strokeWidth={0} />
             </a>
             <a
               href="https://www.youtube.com/c/AlumniIME/featured"
               className={styles.iconCircle}
             >
               {/* YouTube: SEM fill e com strokeWidth maior para aparecer o triângulo */}
-              <Youtube size={26} strokeWidth={2.5} />
+              <Youtube size={23} strokeWidth={2.5} />
             </a>
             <a
               href="https://www.instagram.com/alumniime/"
               className={styles.iconCircle}
             >
               {/* Instagram: Segue o padrão de traço mais grosso */}
-              <Instagram size={26} strokeWidth={2.5} />
+              <Instagram size={23} strokeWidth={2.5} />
             </a>
           </div>
 

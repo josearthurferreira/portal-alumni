@@ -37,7 +37,7 @@ const Header = ({
         <h1 className={styles.titleLogo} onClick={() => navigate('/')}>
           <div className={styles.logoWrapper}>
             <img
-              src="https://optim.tildacdn.one/tild6638-3331-4435-b761-623064663465/-/resize/90x/-/format/webp/AlumniIME_Logo.png.webp"
+              src="https://static.tildacdn.one/tild6530-6134-4263-b239-376138343437/AlumniIME_Logo_1_1.png"
               alt="Logo alumni"
             />
           </div>
