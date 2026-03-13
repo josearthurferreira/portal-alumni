@@ -58,10 +58,15 @@ const getFilterOptions = async (req, res) => {
       distinct: ['graduationYear'],
     });
 
+    const rolesData = await prisma.alumnus.findMany({
+      select: { role: true },
+      distinct: ['role'],
+    });
+
     res.json({
       courses: coursesData.map(c => c.course).filter(Boolean).sort(),
       years: yearsData.map(y => y.graduationYear).filter(Boolean).sort((a, b) => b - a),
-      roles: []
+      roles: rolesData.map(r => r.role).filter(Boolean).sort()
     });
   } catch (error) {
     console.error("Erro no Prisma:", error);

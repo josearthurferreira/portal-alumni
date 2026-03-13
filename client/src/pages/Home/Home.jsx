@@ -87,11 +87,6 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
     fetchAlumni(query, page);
   }, [selectedCurso, selectedAno, selectedArea, searchTerm, page]);
 
-  // Reset de página ao mudar filtros
-  useEffect(() => {
-    setPage(1);
-  }, [searchTerm, selectedCurso, selectedAno, selectedArea]);
-
   // Verifica perfil do usuário logado
   useEffect(() => {
     if (!isLoggedIn) {
@@ -119,16 +114,28 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
 
         <SearchBar
           searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          onSearchChange={(value) => {
+            setSearchTerm(value);
+            setPage(1); // Reseta a página aqui!
+          }}
           cursos={availableCourses}
           selectedCurso={selectedCurso}
-          onCursoChange={setSelectedCurso}
+          onCursoChange={(value) => {
+            setSelectedCurso(value);
+            setPage(1);
+          }}
           anos={availableYears}
           selectedAno={selectedAno}
-          onAnoChange={setSelectedAno}
+          onAnoChange={(value) => {
+            setSelectedAno(value);
+            setPage(1);
+          }}
           areas={availableRoles}
           selectedArea={selectedArea}
-          onAreaChange={setSelectedArea}
+          onAreaChange={(value) => {
+            setSelectedArea(value);
+            setPage(1);
+          }}
         />
 
         {!loading && (
@@ -213,7 +220,8 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
               setIsAddModalOpen(false);
               fetchAlumni({}, 1);
             } catch (error) {
-              setErrorMessage("Erro ao salvar perfil.");
+              const msg = error.response?.data?.message || "Erro ao salvar perfil.";
+              setErrorMessage(msg);
             }
           }}
         />
