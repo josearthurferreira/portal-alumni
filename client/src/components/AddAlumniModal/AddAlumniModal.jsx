@@ -1264,6 +1264,7 @@ export default function AddAlumniModal({
   const birthInputRef = useRef(null);
   const gradYearInputRef = useRef(null);
   const phoneInputRef = useRef(null);
+  const linkedinInputRef = useRef(null);
 
   // Ref para input date escondido
   const hiddenDateRef = useRef(null);
@@ -1410,9 +1411,9 @@ export default function AddAlumniModal({
               ? p.skills
               : typeof p.skills === 'string' && p.skills.trim()
                 ? p.skills
-                  .split(',')
-                  .map((s) => s.trim())
-                  .filter(Boolean)
+                    .split(',')
+                    .map((s) => s.trim())
+                    .filter(Boolean)
                 : [],
           }));
         } catch (err) {
@@ -1446,8 +1447,6 @@ export default function AddAlumniModal({
       }
     };
   }, [form.photoPreviewUrl, form.photoFile]);
-
-
 
   function openCalendar() {
     const el = hiddenDateRef.current;
@@ -1539,7 +1538,7 @@ export default function AddAlumniModal({
     setCustomFieldError(phoneInputRef, 'phone', phoneMsg);
 
     const linkedinMsg = validateLinkedinUrl(form.linkedinUser);
-    setExtraErrors((prev) => ({ ...prev, linkedinUser: linkedinMsg }));
+    setCustomFieldError(linkedinInputRef, 'linkedinUser', linkedinMsg);
   }
 
   async function handleSubmit(e) {
@@ -1547,7 +1546,6 @@ export default function AddAlumniModal({
     setShowValidation(true);
 
     runCustomValidations();
-    
 
     const formEl = formRef.current;
     if (formEl && !formEl.checkValidity()) {
@@ -1879,7 +1877,10 @@ export default function AddAlumniModal({
                     setExtraErrors((prev) => ({ ...prev, graduationYear: '' }));
                   }}
                   onBlur={() => {
-                    const msg = validateGraduationYear(form.birthDate, form.graduationYear);
+                    const msg = validateGraduationYear(
+                      form.birthDate,
+                      form.graduationYear,
+                    );
                     setCustomFieldError(
                       gradYearInputRef,
                       'graduationYear',
@@ -1974,9 +1975,9 @@ export default function AddAlumniModal({
 
                         {/* fallback se a cidade salva não estiver na lista */}
                         {form.city &&
-                          !loadingCities &&
-                          Array.isArray(cities) &&
-                          !cities.includes(String(form.city).trim()) ? (
+                        !loadingCities &&
+                        Array.isArray(cities) &&
+                        !cities.includes(String(form.city).trim()) ? (
                           <option value={String(form.city).trim()}>
                             {String(form.city).trim()} (salvo)
                           </option>
@@ -2140,15 +2141,21 @@ export default function AddAlumniModal({
                 <div className="linkedinWrap">
                   <span className="linkedinPrefix">Link:</span>
                   <input
+                    ref={linkedinInputRef}
                     name="linkedinUser"
                     value={form.linkedinUser}
                     onChange={(e) => setField('linkedinUser', e.target.value)}
+                    onInput={(e) => {
+                      e.target.setCustomValidity('');
+                      setExtraErrors((prev) => ({ ...prev, linkedinUser: '' }));
+                    }}
                     onBlur={() => {
                       const msg = validateLinkedinUrl(form.linkedinUser);
-                      setExtraErrors((prev) => ({
-                        ...prev,
-                        linkedinUser: msg,
-                      }));
+                      setCustomFieldError(
+                        linkedinInputRef,
+                        'linkedinUser',
+                        msg,
+                      );
                     }}
                     placeholder="https://www.linkedin.com/in/seu-perfil"
                     className="linkedinInput"
