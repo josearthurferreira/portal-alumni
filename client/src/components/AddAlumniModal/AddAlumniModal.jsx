@@ -2165,8 +2165,9 @@ export default function AddAlumniModal({
                   name="bio"
                   value={form.bio}
                   onChange={(e) => setField('bio', e.target.value)}
-                  placeholder="Conte sobre você, sua experiência e interesses..."
+                  placeholder="Conte sobre você, sua experiência e interesses... (máximo de 5000 caracteres)"
                   rows={4}
+                  maxLength={5000}
                 />
               }
             />
