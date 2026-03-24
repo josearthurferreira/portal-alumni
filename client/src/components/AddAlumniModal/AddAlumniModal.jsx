@@ -86,6 +86,7 @@ export default function AddAlumniModal({
   const birthInputRef = useRef(null);
   const gradYearInputRef = useRef(null);
   const phoneInputRef = useRef(null);
+  const linkedinInputRef = useRef(null);
 
   // Ref para input date escondido
   const hiddenDateRef = useRef(null);
@@ -359,7 +360,7 @@ export default function AddAlumniModal({
     setCustomFieldError(phoneInputRef, 'phone', phoneMsg);
 
     const linkedinMsg = validateLinkedinUrl(form.linkedinUser);
-    setExtraErrors((prev) => ({ ...prev, linkedinUser: linkedinMsg }));
+    setCustomFieldError(linkedinInputRef, 'linkedinUser', linkedinMsg);
   }
 
   async function handleSubmit(e) {
@@ -962,15 +963,21 @@ export default function AddAlumniModal({
                 <div className="linkedinWrap">
                   <span className="linkedinPrefix">Link:</span>
                   <input
+                    ref={linkedinInputRef}
                     name="linkedinUser"
                     value={form.linkedinUser}
                     onChange={(e) => setField('linkedinUser', e.target.value)}
+                    onInput={(e) => {
+                      e.target.setCustomValidity('');
+                      setExtraErrors((prev) => ({ ...prev, linkedinUser: '' }));
+                    }}
                     onBlur={() => {
                       const msg = validateLinkedinUrl(form.linkedinUser);
-                      setExtraErrors((prev) => ({
-                        ...prev,
-                        linkedinUser: msg,
-                      }));
+                      setCustomFieldError(
+                        linkedinInputRef,
+                        'linkedinUser',
+                        msg,
+                      );
                     }}
                     placeholder="https://www.linkedin.com/in/seu-perfil"
                     className="linkedinInput"
