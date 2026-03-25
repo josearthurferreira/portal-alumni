@@ -16,11 +16,13 @@ const Login = ({ setIsLoggedIn }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
 
     if (isRegister && password !== confirmPassword) {
       setError('As senhas não coincidem!');
@@ -34,6 +36,13 @@ const Login = ({ setIsLoggedIn }) => {
           email: email.trim(),
           password,
         });
+
+        setSuccessMessage('Conta criada! Verifique seu e-mail para confirmar o cadastro antes de entrar.');
+        setIsRegister(false); 
+        setFullName('');
+        setPassword('');
+        setConfirmPassword('');
+        return;
       }
 
       const response = await login({
@@ -72,6 +81,13 @@ const Login = ({ setIsLoggedIn }) => {
         <p>Apenas membros cadastrados podem adicionar novos ex-alunos.</p>
 
         <ErrorBanner message={error} onClose={() => setError('')} />
+
+        {successMessage && (
+          <div className={styles.successBanner}>
+            <p>{successMessage}</p>
+            <button onClick={() => setSuccessMessage('')}>X</button>
+          </div>
+        )}
 
         {isRegister && (
           <div className={styles.inputBox}>
