@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
 
 import { login, register } from '../../services/api';
-// 1. Importe o componente
 import ErrorBanner from '../../components/ErrorBanner/ErrorBanner';
+import { Eye, EyeOff, Mail } from 'lucide-react';
 
 const Login = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
@@ -15,8 +15,8 @@ const Login = ({ setIsLoggedIn }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Mantemos o estado de erro que você já tinha
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,14 +53,11 @@ const Login = ({ setIsLoggedIn }) => {
     } catch (err) {
       const data = err?.response?.data;
 
-      // Lógica aprimorada para erros do Zod
       let msg = data?.message || err?.message || 'Erro ao autenticar.';
 
       if (data?.errors?.length) {
-        // Se o seu middleware retorna 'errors' do Zod:
         msg = data.errors.map((e) => e.mensagem).join(' | ');
       } else if (data?.issues?.length) {
-        // Fallback para o formato 'issues'
         msg = data.issues.map((i) => i.message).join(' | ');
       }
 
@@ -74,43 +71,55 @@ const Login = ({ setIsLoggedIn }) => {
         <h2>{isRegister ? 'Criar Conta' : 'Acessar Portal'}</h2>
         <p>Apenas membros cadastrados podem adicionar novos ex-alunos.</p>
 
-        {/* 2. Substituímos o <p> antigo pelo ErrorBanner */}
         <ErrorBanner message={error} onClose={() => setError('')} />
 
         {isRegister && (
-          <input
-            type="text"
-            placeholder="Nome Completo"
-            required
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
+          <div className={styles.inputBox}>
+            <input
+              type="text"
+              placeholder="Nome Completo"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </div>
         )}
 
-        <input
-          type="email"
-          placeholder="E-mail"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <div className={styles.inputBox}>
+          <input
+            type="email"
+            placeholder="E-mail"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Mail color="#666" size={20} />
+        </div>
 
-        <input
-          type="password"
-          placeholder="Senha"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className={styles.inputBox}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Senha"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <span onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </span>
+        </div>
 
         {isRegister && (
-          <input
-            type="password"
-            placeholder="Confirme a senha"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
+          <div className={styles.inputBox}>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Confirme a senha"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
         )}
 
         <button type="submit" className={styles.loginBtn}>
@@ -130,6 +139,16 @@ const Login = ({ setIsLoggedIn }) => {
         >
           {isRegister ? 'Já tenho conta' : 'Não tenho conta'}
         </button>
+
+        {!isRegister && (
+          <button
+            type="button"
+            className={styles.forgotBtn}
+            onClick={() => navigate('/forgot-password')}
+          >
+            Esqueci minha senha
+          </button>
+        )}
       </form>
     </div>
   );

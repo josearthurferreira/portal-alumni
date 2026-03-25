@@ -1,213 +1,361 @@
+/* --- Animações --- */
+@keyframes overlayFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- Overlay & Modal --- */
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.6); /* Um pouco mais escuro para contraste */
+  backdrop-filter: blur(4px); /* Efeito de desfoque no fundo */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  z-index: 50;
+  padding: 16px;
+  z-index: 9999;
+  animation: overlayFade 0.3s ease-out forwards;
 }
 
 .modal {
-  width: min(920px, 100%);
+  width: min(800px, 100%); /* Largura um pouco mais contida para leitura */
   max-height: 90vh;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
   background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-  -webkit-overflow-scrolling: touch;
+  border-radius: 16px; /* Bordas mais arredondadas */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
   overscroll-behavior: contain;
+  animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* --- Header --- */
 .header {
+  position: sticky; /* Mantém o título visível ao rolar */
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 22px;
-  border-bottom: 1px solid #e7e7e7;
+  padding: 20px 32px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
+  color: #1f2937;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
 .closeButton {
-  border: 0;
-  background: transparent;
-  font-size: 26px;
+  border: none;
+  background: #f3f4f6;
+  color: #4b5563;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%; /* Botão circular */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  /*padding-bottom: 4px;*/
   line-height: 1;
-  padding: 6px 10px;
-  border-radius: 8px;
 }
 
 .closeButton:hover {
-  background: #f3f3f3;
+  background: #e5e7eb;
+  color: #111;
+  transform: rotate(90deg); /* Pequena animação ao passar o mouse */
 }
 
+/* --- Form Container --- */
 .form {
-  padding: 18px 22px 22px;
+  padding: 32px;
 }
+
 .formError {
-  margin: 8px 0 12px;
-  padding: 10px 12px;
+  margin: 0 0 24px 0;
+  padding: 12px 16px;
   border-radius: 8px;
-  background: #fff1f0;
-  border: 1px solid #ffccc7;
-  color: #a8071a;
-  font-size: 0.95rem;
-}
-
-.photoSection {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
   align-items: center;
-  margin-bottom: 18px;
+  gap: 8px;
 }
 
+/* Container Principal: Foto na esquerda, Ações na direita */
+.photoSection {
+  display: flex;
+  align-items: center; /* Centraliza verticalmente */
+  gap: 24px; /* Espaço entre a foto e os botões */
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.photoSectionBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 15.82rem;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(4px);
+  z-index: -1;
+  opacity: 0.5;
+}
+
+/* --- Área da Foto (Círculo) --- */
 .photoCircle {
-  width: 96px;
-  height: 96px;
-  border-radius: 999px;
-  border: 2px dashed #d7d7d7;
-  display: grid;
-  place-items: center;
+  width: 120px; /* Tamanho (igual ao w-32 do tailwind) */
+  height: 120px;
+  flex-shrink: 0; /* Garante que não amasse */
+  border-radius: 50%;
   overflow: hidden;
+  background: #f3f4f6; /* Cor de fundo do placeholder */
+  border: 4px solid #ffffff; /* Borda interna branca */
+  box-shadow:
+    0 0 0 1px #e5e7eb,
+    0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+
+  /* Centralizar ícone/placeholder */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .photoImg {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-}
-
-.photoIcon {
-  font-size: 22px;
-  opacity: 0.7;
-}
-
-.photoLabel {
-  font-weight: 600;
-  margin-bottom: 6px;
+  object-fit: cover; /* A imagem preenche o círculo sem deformar */
   display: block;
 }
 
+.photoIcon {
+  font-size: 48px; /* Tamanho do emoji/ícone */
+  line-height: 1;
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+/* --- Área dos Botões (Direita) --- */
 .photoActions {
   display: flex;
+  flex-direction: column; /* Empilha os botões: Upload em cima, Remover embaixo */
+  align-items: flex-start; /* Alinha tudo à esquerda (perto da foto) */
   gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
+}
+.photoButtons {
+  display: flex;
+  gap: 10px;
 }
 
+/* Esconde o input nativo feio */
 .fileInput {
-  display: none;
+  display: none !important;
 }
 
+/* Botão Laranja (Label) */
 .photoButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #d7d7d7;
-  background: #ffffff;
-  cursor: pointer;
+  background-color: #f27a1a;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
   font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.1s;
+  box-shadow: 0 2px 5px rgba(242, 122, 26, 0.25);
+}
+
+.photoButton span {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .photoButton:hover {
-  background: #f7f7f7;
+  background-color: #d9650c;
+  transform: translateY(-1px);
 }
 
-.photoHint {
+/* Botão Remover (Secundário) */
+.removeButton {
+  background: white;
+  border: 0px solid #fee2e2;
+  color: #121a36;
+  /* color: #121a36; */
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.removeButton span {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.removeButton:hover {
+  color: #ffffff;
+  background: #121a36;
+  border-color: #fecaca;
+}
+
+/* Texto de Erro */
+.errorText {
+  color: #ef4444;
   font-size: 12px;
-  color: #666;
+  margin-top: 4px;
 }
 
+/* --- Grid & Inputs --- */
 .grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px 16px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px; /* Mais respiro entre campos */
 }
 
 .fullWidth {
   grid-column: 1 / -1;
 }
 
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .label {
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 6px;
-  color: #111;
+  color: #374151;
+  margin-left: 2px;
 }
 
 .required {
-  color: #d13b3b;
-  font-weight: 700;
+  color: #f27a1a;
+  margin-left: 4px;
 }
 
 .control input,
 .control select,
 .control textarea {
   width: 100%;
-  border: 1px solid #d7d7d7;
-  border-radius: 8px;
-  padding: 11px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 2px 20px 20px 20px;
+  padding: 12px 16px; /* Input mais alto e confortável */
   font-size: 14px;
+  background: #ffffff;
+  color: #1f2937;
+  transition: all 0.2s ease;
   outline: none;
-  background: #fff;
+}
+
+.control select {
+  padding-right: 20px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
 }
 
 .control textarea {
+  font-family: 'Open Sans', Arial, sans-serif;
+  min-height: 120px;
   resize: vertical;
-  min-height: 110px;
+  line-height: 1.5;
 }
 
 .control input:focus,
 .control select:focus,
 .control textarea:focus {
-  border-color: #c8c8c8;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+  border-color: #f27a1a;
+  box-shadow: 0 0 0 4px rgba(242, 122, 26, 0.1); /* Anel de foco suave */
+  background-color: #fff;
 }
 
-/* Readonly (mock vindo do login/db) */
+.control input::placeholder,
+.control textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Readonly fields */
 .control input.readonly {
-  background: #f3f3f3;
-  color: #444;
-  cursor: not-allowed;
+  background: #f9fafb;
+  border-color: #f3f4f6;
+  color: #6b7280;
+  cursor: default;
+  font-weight: 500;
 }
 
 .control input.readonly:focus {
   box-shadow: none;
-  border-color: #d7d7d7;
+  border-color: #f3f4f6;
 }
 
 .hint {
-  margin: 6px 0 0;
   font-size: 12px;
-  color: #666;
+  color: #6b7280;
+  margin-top: 4px;
 }
 
 .errorText {
-  margin: 6px 0 0;
   font-size: 12px;
-  color: #d13b3b;
+  color: #ef4444;
+  margin-top: 4px;
+  font-weight: 500;
 }
 
 .linkedinWrap {
   display: flex;
   align-items: center;
   border: 1px solid #d7d7d7;
-  border-radius: 8px;
+  border-radius: 0 20px 20px 20px;
   overflow: hidden;
 }
 
@@ -218,10 +366,12 @@
   color: #333;
   border-right: 1px solid #d7d7d7;
   white-space: nowrap;
+  border-radius: 0 0 0 20px;
 }
 
 .linkedinInput {
   border: 0 !important;
+  border-radius: 2px 20px 20px 20px;
   border-radius: 0 !important;
 }
 
@@ -242,6 +392,7 @@
   font-weight: 700;
   cursor: pointer;
   min-width: 160px;
+  width: 100%;
 }
 
 .cancelButton:hover {
@@ -249,7 +400,7 @@
 }
 
 .submitButton {
-  padding: 12px 16px;
+  padding: 12px 18px;
   border-radius: 10px;
   border: 0;
   background: #f27a1a;
@@ -257,6 +408,14 @@
   font-weight: 800;
   cursor: pointer;
   min-width: 220px;
+  width: 100%;
+}
+
+.submitButton span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .submitButton:disabled,
@@ -289,21 +448,26 @@
   position: relative;
   display: grid;
   grid-template-columns: 1fr 46px;
-  gap: 10px;
+  gap: 4px;
   align-items: center;
+}
+
+.dateRow input {
+  border-radius: 0px 0px 0px 20px;
 }
 
 .calendarBtn {
   height: 44px;
-  border-radius: 8px;
-  border: 1px solid #d7d7d7;
-  background: #fff;
+  border-radius: 0px 20px 20px 0px;
+  border: 0px solid #d7d7d7;
+  background: #f27a1a;
+  color: white;
   cursor: pointer;
   font-size: 18px;
 }
 
 .calendarBtn:hover {
-  background: #f7f7f7;
+  background: #f6892f;
 }
 
 /* input date escondido */
@@ -492,7 +656,7 @@
   gap: 8px;
   background: #f8f9fa;
   color: #2d3436;
-  padding: 6px 14px;
+  padding: 6px 10px;
   border-radius: 20px; /* Estilo pílula */
   font-size: 13px;
   font-weight: 600;
@@ -523,6 +687,7 @@
   font-size: 14px;
   color: #868e96;
   transition: all 0.2s;
+  padding-bottom: 3px;
 }
 
 .skillTag:hover button {
@@ -532,4 +697,19 @@
 
 .skillTag button:hover {
   transform: scale(1.1);
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 18px;
+  }
+  .photoButtons {
+    flex-direction: column;
+  }
+  .removeButton {
+    font-size: 12px;
+  }
+  .photoButton {
+    font-size: 12px;
+  }
 }

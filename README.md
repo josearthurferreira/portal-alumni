@@ -6,11 +6,18 @@ Sistema centralizado para gestão e networking de egressos da instituição. O p
 
 ## 🚀 Stack Tecnológica
 
-- **Frontend:** React.js (Vite)
-- **Backend:** Node.js (Express)
+**Aplicação:**
+- **Frontend:** React.js (Vite), CSS Puro / Modules
+- **Backend:** Node.js (Express), CORS, Helmet
 - **Banco de Dados:** PostgreSQL
 - **ORM:** Prisma
-- **Estilização:** CSS Puro / CSS Modules (Kebab-case)
+- **Upload de Arquivos:** Cloudinary
+
+**Infraestrutura (Produção):**
+- **Servidor:** Debian Linux
+- **Orquestração:** Docker & Docker Compose
+- **Proxy Reverso:** Nginx
+- **Segurança:** UFW (Firewall) e HTTPS (Certbot)
 
 ---
 
@@ -28,8 +35,7 @@ portal-alumni/
 │   │   ├── controllers/ # Lógica de negócio
 │   │   ├── routes/      # Definição de endpoints
 │   │   └── database/    # Configuração do Prisma
-├── .editorconfig        # Padronização de sistema (LF/CRLF)
-├── .prettierrc          # Formatação automática de código
+├── docker-compose.yml   # Formatação automática de código
 └── README.md
 ```
 
@@ -91,34 +97,34 @@ npm install
 
 ---
 
-## 🔄 Fluxo de Colaboração (Fork Workflow)
+### 🚀 Ambiente de Produção (Servidor)
 
-Este projeto utiliza o modelo de **Forks**. Ao contribuir, siga estes passos:
+O sistema está hospedado em um servidor Debian, utilizando **Docker** para isolamento e **Nginx** como Proxy Reverso.
 
-1. Faça o **Fork** deste repositório para sua conta GitHub.
-2. Antes de iniciar qualquer tarefa, atualize sua branch principal com o código mais recente:
-   `git pull upstream main`
-3. Crie uma branch específica para a sua tarefa: `git checkout -b feat/nome-da-task`.
-4. Após finalizar e testar, envie para o **seu fork** e abra um **Pull Request (PR)** para o repositório original.
+- **Domínio Oficial**: https://portal.alumniime.com.br
 
+## Segurança e CORS
+
+O Backend possui uma whitelist estrita de CORS. A API só responderá às requisições se a origem for autorizada. Se criar um novo ambiente, adicione a URL no arquivo `server/src/server.js`.
+As portas internas do Docker (`3001` e `8080`) são mapeadas apenas para `127.0.0.1`, ficando inacessíveis pela internet externa. O Nginx gerencia o tráfego nas portas 80 e 443.
+
+**Como atualizar a Produção**
+
+Acesse o terminal do servidor Debian e execute:
+
+```bash
+cd ~/portal-alumni
+git pull origin main
+docker compose up -d --build
+```
 ---
 
-## 🗓️ Cronograma de Sprints (2025/2026)
+## 👥 Equipe Desenvolvedora
 
-- **Sprint 1 (24/12 - 31/12):** UI/UX Base, Listagem de Alumni e Filtros.
-- **Sprint 2 & 3 (31/12 - 14/01):** API Node.js e Lógica de Cadastro.
-- **Sprint 4 (14/01 - 21/01):** Modelagem PostgreSQL e Integração.
-- **Sprint 5 & 6 (21/01 - 04/02):** Refinamento, Deploy e QA Final.
-- **Entrega Final:** 11/02/2026.
+Desenvolvido pela **IME Júnior** (2025/2026)
 
----
-
-## 👥 Equipe
-
-- **Gerente de Projeto & Dev:** José Arthur Ferreira Cardoso
+- **Gerente de Projeto & Desenvolvedor:** José Arthur Ferreira Cardoso
 - **Desenvolvedor:** Thiago Domingos Ferreira da Silva
 - **Desenvolvedor:** Francisco do Nascimento Miranda
 
 ---
-
-_Desenvolvido pela IME Júnior._

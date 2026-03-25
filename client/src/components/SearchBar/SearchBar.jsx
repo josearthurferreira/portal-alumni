@@ -1,16 +1,19 @@
 import React from 'react';
-import { Search } from 'lucide-react';
+import { Search } from 'lucide-react'; // Import limpo
 import styles from './SearchBar.module.css';
 
 const SearchBar = ({
   searchTerm,
   onSearchChange,
-  cursos,
+  cursos = [], // Garantindo array vazio por padrão
   selectedCurso,
   onCursoChange,
-  anos,
+  anos = [],
   selectedAno,
-  onAnoChange
+  onAnoChange,
+  areas = [],
+  selectedArea,
+  onAreaChange
 }) => {
   return (
     <section className={styles.searchBar}>
@@ -30,7 +33,7 @@ const SearchBar = ({
         onChange={(e) => onCursoChange(e.target.value)}
       >
         <option value="">Todos os Cursos</option>
-        {cursos.map(curso => (
+        {cursos?.map(curso => (
           <option key={curso} value={curso}>{curso}</option>
         ))}
       </select>
@@ -41,8 +44,19 @@ const SearchBar = ({
         onChange={(e) => onAnoChange(e.target.value)}
       >
         <option value="">Todos os Anos</option>
-        {anos.map(ano => (
+        {anos?.map(ano => (
           <option key={ano} value={ano}>{ano}</option>
+        ))}
+      </select>
+
+      <select
+        className={styles.filterSelect}
+        value={selectedArea}
+        onChange={(e) => onAreaChange(e.target.value)}
+      >
+        <option value="">Todas as Áreas</option> {/* Corrigido */}
+        {areas?.map(area => (
+          <option key={area} value={area}>{area}</option>
         ))}
       </select>
     </section>

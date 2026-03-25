@@ -1,63 +1,58 @@
 .footer {
   color: #ffffff;
-  padding: 3rem 2rem;
+  padding: 3rem 10rem;
   width: 100%;
+  background-image: linear-gradient(
+    to bottom,
+    #121a36 50%,
+    rgba(250, 105, 19, 0.6) 220%
+  );
+  height: 212px;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: flex-end; /* Alinha os blocos pela base */
-  gap: 2rem;
+  gap: 2.4rem;
+  padding: 1.2rem 3.6rem 0rem 0rem ;
+  
 }
 
 .leftSection {
+  margin-left: 16px;
   display: flex;
+  font-size: 14px;
   flex-direction: column;
-  gap: 0.5rem;
-}
-
-.title {
-  color: #d4a017;
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.slogan {
-  font-size: 1rem;
-  color: #cbd5e1; /* Branco levemente acinzentado */
-  margin: 0 0 1rem 0;
-}
-
-.legalInfo {
-  font-size: 0.85rem;
-  color: #94a3b8;
-}
-
-.legalInfo p {
-  margin: 2px 0;
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-weight: 400;
+  gap: 0.3rem;
+  align-items: center;
+  color: #ffffff;
 }
 
 .rightSection {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 1.5rem;
+  gap: 1.2rem;
+  margin-left: 50px;
 }
 
 .socialIcons {
   display: flex;
-  gap: 12px;
-  margin-bottom: 15px;
+  width: 100%;
+  justify-content: space-evenly;
+  gap: 14px;
+  margin-bottom: 4px;
 }
 
 .iconCircle {
   background-color: white;
-  width: 38px; /* Tamanho do círculo */
-  height: 38px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -68,29 +63,144 @@
 
 .iconCircle:hover {
   transform: translateY(-2px);
-  background-color: #f0f0f0;
+  background-color: #d4a017;
 }
 
 .legalLink {
-  color: #d4a017; /* Tom dourado da imagem */
+  color: rgb(219, 188, 116); /* Tom dourado da imagem */
   text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.legalLink:hover {
-  text-decoration: underline;
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* Responsividade para telas menores */
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
+  .container{
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  .iconCircle {
+    width: 32px;
+    height: 32px;
+  }
+  .leftSection {
+    font-size: 10px;
+    padding: 20px;
+  }
+
+  .rightSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  .socialIcons {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    gap: 0px;
+    margin-bottom: 8px;
+  }
+  .legalLink{
+    font-size: 10px;
+  }
+  .leftSection {
+    font-size: 12px;
+    padding: 10px;
+    margin-top: 10px;
+  }
+  .legalLink{
+    font-size: 12px;
+  }
+  .rightSection{
+    margin-top: 10px;
+    justify-content: center;
+    margin-right: 6rem;
+    gap:16px;
+  }
+}
+
+@media (max-width: 950px) {
+  .footer{
+    padding: 0rem 0rem 0rem 0rem ;
+    height: 122px;
+  }
+
+  .container{
+    width: 560px;
+    padding: 0rem 0rem 0rem 0rem ;
+    height: 122px;
+    align-items: center;
+  }
+  .socialIcons{
+    gap:10px;
+    width: 90%;
+    justify-content: flex-start;
+    margin-right: 0.4rem;
+  }
+  .iconCircle {
+    width: 34px;
+    height: 34px;
+  }
+  .leftSection {
+    font-size: 10px;
+    padding: 0px;
+    gap: 2px;
+    margin-top: 5px;
+    margin-left: 0px;
+  }
+  .legalLink{
+    font-size: 10px;
+  }
+  .rightSection{
+    margin-top: 10px;
+    justify-content: space-between;
+    margin-right: 0rem;
+    gap:10px;
+    margin-right: 1rem;
+    margin-left: 0px;
+  }
+}
+
+@media (max-width: 750px){
+  .footer{
+    height: 252px;
+  }
+
+  .leftSection {
+    font-size: 10px;
+    padding: 20px;
+  }
   .container {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    padding-bottom: 10px;
+    padding-top: 10px;
   }
-
+  .leftSection{
+    font-size: 12px;
+  }
   .rightSection {
     align-items: center;
+    margin-right: 0rem;
+    gap: 12px;
+  }
+  .socialIcons{
+    gap:10px;
+    width: 100%;
+    justify-content: center;
+    margin-right: 0rem;
+  }
+  .legalLink{
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 750px){
+  .footer{
+    height: 300px ;
   }
 }

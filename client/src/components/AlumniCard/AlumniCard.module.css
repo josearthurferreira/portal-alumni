@@ -3,29 +3,50 @@
   max-width: 320px;
   background: #fff;
   border: 2px solid #333;
-  border-radius: 12px;
-  padding: 1.5rem;
+  border-radius: 22px;
+  /* padding: 1.5rem; */
+  padding: 10px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   transition: transform 0.2s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.card:hover { transform: translateY(-4px); }
+.card:hover {
+  transform: translateY(-4px);
+}
 
 .profilePic {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
+  display: inline;
+  width: 100%;
+  height: 180px;
+
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 30%);
+  mask-image: linear-gradient(to top, transparent 0%, black 30%);
+
+  border-radius: 6%;
   object-fit: cover;
-  margin-bottom: 1rem;
+  margin-bottom: 0rem;
+}
+
+.list {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
 }
 
 .card h3 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
   font-weight: 700;
   color: #121a36;
   align-items: center;
   justify-content: center;
+  text-align: left;
 }
 
 .card p {
@@ -36,6 +57,22 @@
   align-items: center;
   justify-content: center;
   font-size: 0.9rem;
+}
+
+.course {
+  color: #424242;
+  margin: 0.25rem 0.25rem;
+  display: block;
+  line-height: 1.5;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.gradicon {
+  display: inline-block;
+  vertical-align: -14%;
+  margin-right: 4px;
+  margin-left: -4px;
 }
 
 .icons {
