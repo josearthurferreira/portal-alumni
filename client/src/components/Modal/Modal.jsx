@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   X,
   GraduationCap,
@@ -9,6 +9,37 @@ import {
   User,
 } from 'lucide-react';
 import styles from './Modal.module.css';
+
+const ExpandableBio = ({ text }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const maxLength = 250;
+
+  if (!text) {
+    return <p className={styles.description}>Este ex-aluno ainda não adicionou uma biografia.</p>;
+  }
+
+  if (text.length <= maxLength) {
+    return (
+      <div className={styles.bioWrapper}>
+        <p className={styles.description}>{text}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.bioWrapper}>
+      <p className={styles.description}>
+        {isExpanded ? text : `${text.slice(0, maxLength)}...`}
+      </p>
+      <button 
+        className={styles.readMoreBtn}
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {isExpanded ? 'Ler menos' : 'Ler mais'}
+      </button>
+    </div>
+  );
+};
 
 const Modal = ({ data, onClose }) => {
   if (!data) return null;
@@ -72,9 +103,7 @@ const Modal = ({ data, onClose }) => {
 
             <section>
               <h3>Sobre</h3>
-              <p className={styles.description}>
-                {data.bio || 'Este ex-aluno ainda não adicionou uma biografia.'}
-              </p>
+              <ExpandableBio text={data.bio} />
             </section>
 
             <section>

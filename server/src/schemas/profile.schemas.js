@@ -24,7 +24,7 @@ const profileSchema = z.object({
   role: z.string().optional().nullable(),
   phone: z.string().min(10),
   linkedinUrl: z.string().url().optional().or(z.literal('')),
-  bio: z.string().max(500).optional().nullable(),
+  bio: z.string().max(5000).optional().nullable(),
 
   // Transforma a string de skills (ex: "React,Node") em Array
   skills: z.preprocess((val) => {

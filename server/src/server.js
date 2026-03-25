@@ -15,19 +15,25 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3001',
   'http://localhost:5173',
-  'https://portal-alumni-ruddy.vercel.app'
+  'http://localhost:5174',
+  'https://alumniime.com.br',
+  'https://portal.alumniime.com.br',
 ];
 
 // --- 1. LOGGER DE EMERGÊNCIA (DEVE SER O PRIMEIRO) ---
 app.use((req, res, next) => {
-  console.log(`[DEBUG] Chamada: ${req.method} ${req.url} - Origin: ${req.headers.origin}`);
+  console.log(
+    `[DEBUG] Chamada: ${req.method} ${req.url} - Origin: ${req.headers.origin}`,
+  );
   next();
 });
 
 // --- 2. HELMET (CONFIGURADO PARA NÃO BARRAR LOCALHOST) ---
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }),
+);
 
 // --- 3. CONFIGURAÇÃO DO CORS ---
 const corsOptions = {
@@ -35,7 +41,8 @@ const corsOptions = {
     if (!origin) return callback(null, true);
 
     const isAllowed = allowedOrigins.includes(origin);
-    const isVercelPreview = origin.includes('portal-alumni') && origin.endsWith('.vercel.app');
+    const isVercelPreview =
+      origin.includes('portal-alumni') && origin.endsWith('.vercel.app');
 
     if (isAllowed || isVercelPreview) {
       return callback(null, true);
@@ -47,7 +54,7 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   credentials: true,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204,
 };
 
 app.use(cors(corsOptions));
@@ -61,6 +68,7 @@ app.use(express.json());
 app.use(logger);
 
 // --- 6. ROTAS ---
+// --- 6. ROTAS ---
 app.use('/alumni', alumniRoutes);
 app.use('/auth', authRoutes);
 app.use('/me', meRoutes);
@@ -73,10 +81,8 @@ app.get('/', (req, res) => {
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3001;
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+});
 
 module.exports = app;

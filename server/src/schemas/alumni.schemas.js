@@ -55,6 +55,11 @@ const queryAlumnusSchema = z.object({
   course: z.string().optional(),
   graduationYear: z.coerce.number().optional(), // Ajustado para aceitar número via query string
   city: z.string().optional(),
+  role: z.string().optional(),
+  fullName: z.string().optional(),
+
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(8)
 });
 
 module.exports = {

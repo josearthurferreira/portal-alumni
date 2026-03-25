@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
 
 import { login, register } from '../../services/api';
-// 1. Importe o componente
 import ErrorBanner from '../../components/ErrorBanner/ErrorBanner';
-import { Eye, EyeOff, Mail, Search } from 'lucide-react';
+import { Eye, EyeOff, Mail } from 'lucide-react';
 
 const Login = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
@@ -16,7 +15,6 @@ const Login = ({ setIsLoggedIn }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Mantemos o estado de erro que você já tinha
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -55,14 +53,11 @@ const Login = ({ setIsLoggedIn }) => {
     } catch (err) {
       const data = err?.response?.data;
 
-      // Lógica aprimorada para erros do Zod
       let msg = data?.message || err?.message || 'Erro ao autenticar.';
 
       if (data?.errors?.length) {
-        // Se o seu middleware retorna 'errors' do Zod:
         msg = data.errors.map((e) => e.mensagem).join(' | ');
       } else if (data?.issues?.length) {
-        // Fallback para o formato 'issues'
         msg = data.issues.map((i) => i.message).join(' | ');
       }
 
@@ -76,7 +71,6 @@ const Login = ({ setIsLoggedIn }) => {
         <h2>{isRegister ? 'Criar Conta' : 'Acessar Portal'}</h2>
         <p>Apenas membros cadastrados podem adicionar novos ex-alunos.</p>
 
-        {/* 2. Substituímos o <p> antigo pelo ErrorBanner */}
         <ErrorBanner message={error} onClose={() => setError('')} />
 
         {isRegister && (
@@ -90,6 +84,7 @@ const Login = ({ setIsLoggedIn }) => {
             />
           </div>
         )}
+
         <div className={styles.inputBox}>
           <input
             type="email"
@@ -100,11 +95,13 @@ const Login = ({ setIsLoggedIn }) => {
           />
           <Mail color="#666" size={20} />
         </div>
+
         <div className={styles.inputBox}>
           <input
             type={showPassword ? 'text' : 'password'}
             placeholder="Senha"
             required
+            minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -142,6 +139,16 @@ const Login = ({ setIsLoggedIn }) => {
         >
           {isRegister ? 'Já tenho conta' : 'Não tenho conta'}
         </button>
+
+        {!isRegister && (
+          <button
+            type="button"
+            className={styles.forgotBtn}
+            onClick={() => navigate('/forgot-password')}
+          >
+            Esqueci minha senha
+          </button>
+        )}
       </form>
     </div>
   );

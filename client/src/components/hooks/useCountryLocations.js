@@ -15,7 +15,15 @@ export function useCountryLocations(isOpen, countryIso2, stateCode) {
 
   const countries = useMemo(() => {
     const list = Country.getAllCountries()
-      .map((c) => ({ name: norm(c.name), iso2: norm(c.isoCode) }))
+      .map((c) => {
+        const iso2 = norm(c.isoCode);
+        const originalName = norm(c.name);
+
+        return {
+          iso2,
+          name: iso2 === 'BR' ? 'Brasil' : originalName,
+        };
+      })
       .filter((c) => c.iso2 && c.name)
       .sort((a, b) => {
         if (a.iso2 === 'BR') return -1;

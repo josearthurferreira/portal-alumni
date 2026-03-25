@@ -8,9 +8,13 @@ const alumniController = require('../controllers/alumni.controller');
 const { createAlumnusSchema, queryAlumnusSchema } = require('../schemas/alumni.schemas');
 const { validateBody, validateQuery } = require('../middlewares/validate.middleware');
 
+// 1. Mova a rota de filtros para o TOPO
+router.get('/filters', alumniController.getFilterOptions);
+
+// 2. Rota de listagem com validação de Query
 router.get('/', validateQuery(queryAlumnusSchema), alumniController.listAlumni);
 
-// Adicionamos o middleware upload.single
+// 3. Cadastro
 router.post(
   '/',
   upload.single('profilePicture'),

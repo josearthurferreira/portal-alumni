@@ -1,343 +1,73 @@
 const { PrismaClient } = require('@prisma/client');
+const { faker } = require('@faker-js/faker');
+
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('--- 🧹 Limpando banco de dados ---');
-  await prisma.alumnus.deleteMany(); // Apaga tudo para não duplicar
+  await prisma.alumnus.deleteMany();
 
-  console.log('--- 🌱 Semeando novos dados ---');
+  console.log('🚀 Iniciando o Stress Test: Preparando 6.000 Ex-Alunos...');
 
-  await prisma.alumnus.createMany({
-    data: [
-      {
-        fullName: "José Arthur Ferreira",
-        email: "jose.arthur@exemplo.com",
-        phone: "86999999999",
-        birthDate: new Date("2000-01-01"),
-        course: "Engenharia de Computação",
-        graduationYear: 2023,
-        city: "Teresina",
-        state: "PI",
-        country: "Brasil",
-        role: "Arquiteto de Software",
-        company: "IME Júnior",
-        yearsOfExperience: 3,
-        bio: "Arquiteto inicial do sistema Alumni. Entusiasta de arquitetura escalável.",
-        skills: ["React", "Node.js", "Prisma", "PostgreSQL"]
-      },
-      {
-        fullName: "Thiago Domingos",
-        email: "thiago.d@exemplo.com",
-        phone: "86988888888",
-        birthDate: new Date("1999-05-15"),
-        course: "Engenharia de Computação",
-        graduationYear: 2022,
-        city: "Teresina",
-        state: "PI",
-        country: "Brasil",
-        role: "Desenvolvedor Fullstack",
-        company: "Tech Solutions",
-        yearsOfExperience: 4,
-        bio: "Desenvolvedor focado em soluções robustas para o ecossistema web.",
-        skills: ["JavaScript", "Express", "SQL", "Zod"]
-      },
-      {
-        fullName: "Ana Beatriz Silva",
-        email: "ana.beatriz@exemplo.com",
-        phone: "11977777777",
-        birthDate: new Date("1997-03-20"),
-        course: "Ciência da Computação",
-        graduationYear: 2020,
-        city: "São Paulo",
-        state: "SP",
-        country: "Brasil",
-        role: "Engenheira de Dados",
-        company: "DataCorp",
-        yearsOfExperience: 5,
-        bio: "Especialista em pipelines de dados e Big Data.",
-        skills: ["Python", "Spark", "AWS", "Airflow"]
-      },
-      {
-        fullName: "Lucas Mendes",
-        email: "lucas.mendes@exemplo.com",
-        phone: "21966666666",
-        birthDate: new Date("1998-11-12"),
-        course: "Sistemas de Informação",
-        graduationYear: 2021,
-        city: "Rio de Janeiro",
-        state: "RJ",
-        country: "Brasil",
-        role: "Product Manager",
-        company: "FintechX",
-        yearsOfExperience: 3,
-        bio: "Focado na ponte entre tecnologia e negócios.",
-        skills: ["Agile", "Scrum", "Product Discovery"]
-      },
-      {
-        fullName: "Mariana Costa",
-        email: "mari.costa@exemplo.com",
-        phone: "31955555555",
-        birthDate: new Date("1996-07-08"),
-        course: "Engenharia de Software",
-        graduationYear: 2019,
-        city: "Belo Horizonte",
-        state: "MG",
-        country: "Brasil",
-        role: "DevOps Engineer",
-        company: "Cloud Systems",
-        yearsOfExperience: 6,
-        bio: "Apaixonada por automação e infraestrutura como código.",
-        skills: ["Docker", "Kubernetes", "Terraform", "CI/CD"]
-      },
-      {
-        fullName: "Carlos Eduardo Paiva",
-        email: "carlos.paiva@exemplo.com",
-        phone: "85944444444",
-        birthDate: new Date("2001-02-25"),
-        course: "Engenharia de Computação",
-        graduationYear: 2024,
-        city: "Fortaleza",
-        state: "CE",
-        country: "Brasil",
-        role: "Estagiário",
-        company: "Inova Lab",
-        yearsOfExperience: 1,
-        bio: "Estudante curioso aprendendo sobre sistemas embarcados.",
-        skills: ["C++", "IoT", "Arduino"]
-      },
-      {
-        fullName: "Fernanda Lima",
-        email: "fernanda.lima@exemplo.com",
-        phone: "41933333333",
-        birthDate: new Date("1995-09-30"),
-        course: "Design Digital",
-        graduationYear: 2018,
-        city: "Curitiba",
-        state: "PR",
-        country: "Brasil",
-        role: "UI/UX Designer",
-        company: "Creative Studio",
-        yearsOfExperience: 7,
-        bio: "Focada na experiência do usuário e interfaces intuitivas.",
-        skills: ["Figma", "Adobe XD", "User Research"]
-      },
-      {
-        fullName: "Rafael Souza",
-        email: "rafa.souza@exemplo.com",
-        phone: "51922222222",
-        birthDate: new Date("1999-12-05"),
-        course: "Engenharia de Computação",
-        graduationYear: 2022,
-        city: "Porto Alegre",
-        state: "RS",
-        country: "Brasil",
-        role: "Backend Developer",
-        company: "Global Tech",
-        yearsOfExperience: 3,
-        bio: "Especialista em APIs REST e microsserviços.",
-        skills: ["Go", "RabbitMQ", "Redis", "Docker"]
-      },
-      {
-        fullName: "Juliana Martins",
-        email: "juli.martins@exemplo.com",
-        phone: "61911111111",
-        birthDate: new Date("1994-04-14"),
-        course: "Engenharia de Redes",
-        graduationYear: 2017,
-        city: "Brasília",
-        state: "DF",
-        country: "Brasil",
-        role: "Security Analyst",
-        company: "SafeCloud",
-        yearsOfExperience: 8,
-        bio: "Especialista em segurança ofensiva e pentest.",
-        skills: ["Cybersecurity", "Linux", "Python", "Networking"]
-      },
-      {
-        fullName: "Ricardo Oliveira",
-        email: "ricardo.o@exemplo.com",
-        phone: "81999887766",
-        birthDate: new Date("1998-06-22"),
-        course: "Sistemas de Informação",
-        graduationYear: 2021,
-        city: "Recife",
-        state: "PE",
-        country: "Brasil",
-        role: "Mobile Developer",
-        company: "AppFactory",
-        yearsOfExperience: 4,
-        bio: "Desenvolvedor mobile apaixonado por Flutter.",
-        skills: ["Flutter", "Dart", "Firebase", "State Management"]
-      },
-      {
-        fullName: "Beatriz Nogueira",
-        email: "beatriz.nog@exemplo.com",
-        phone: "11988776655",
-        birthDate: new Date("2000-08-10"),
-        course: "Ciência da Computação",
-        graduationYear: 2023,
-        city: "Campinas",
-        state: "SP",
-        country: "Brasil",
-        role: "Machine Learning Engineer",
-        company: "AI Solutions",
-        yearsOfExperience: 2,
-        bio: "Pesquisadora de modelos generativos.",
-        skills: ["PyTorch", "TensorFlow", "Pandas", "NLP"]
-      },
-      {
-        fullName: "Gustavo Henrique",
-        email: "gustavo.h@exemplo.com",
-        phone: "86977665544",
-        birthDate: new Date("1999-01-30"),
-        course: "Engenharia de Computação",
-        graduationYear: 2022,
-        city: "Teresina",
-        state: "PI",
-        country: "Brasil",
-        role: "Frontend Developer",
-        company: "Webflow Brasil",
-        yearsOfExperience: 3,
-        bio: "Entusiasta de CSS moderno e acessibilidade.",
-        skills: ["Vue.js", "TailwindCSS", "TypeScript"]
-      },
-      {
-        fullName: "Larissa Machado",
-        email: "larissa.m@exemplo.com",
-        phone: "21955443322",
-        birthDate: new Date("1997-10-15"),
-        course: "Engenharia de Software",
-        graduationYear: 2020,
-        city: "Niterói",
-        state: "RJ",
-        country: "Brasil",
-        role: "QA Engineer",
-        company: "TestIt",
-        yearsOfExperience: 5,
-        bio: "Garantindo qualidade através de testes automatizados.",
-        skills: ["Cypress", "Selenium", "Jest", "TDD"]
-      },
-      {
-        fullName: "Paulo Victor",
-        email: "paulo.v@exemplo.com",
-        phone: "48944332211",
-        birthDate: new Date("1996-03-03"),
-        course: "Ciência da Computação",
-        graduationYear: 2019,
-        city: "Florianópolis",
-        state: "SC",
-        country: "Brasil",
-        role: "Tech Lead",
-        company: "Island Soft",
-        yearsOfExperience: 6,
-        bio: "Líder técnico focado em mentoria e boas práticas.",
-        skills: ["Node.js", "Architecture", "Mentoring", "SQL"]
-      },
-      {
-        fullName: "Camila Rocha",
-        email: "camila.rocha@exemplo.com",
-        phone: "62933221100",
-        birthDate: new Date("1998-07-27"),
-        course: "Sistemas de Informação",
-        graduationYear: 2021,
-        city: "Goiânia",
-        state: "GO",
-        country: "Brasil",
-        role: "Business Analyst",
-        company: "AgroTech",
-        yearsOfExperience: 3,
-        bio: "Transformando requisitos complexos em soluções técnicas.",
-        skills: ["BPMN", "UML", "Jira", "SQL"]
-      },
-      {
-        fullName: "Gabriel Antunes",
-        email: "gabriel.a@exemplo.com",
-        phone: "11922110099",
-        birthDate: new Date("1995-12-12"),
-        course: "Engenharia de Computação",
-        graduationYear: 2018,
-        city: "São José dos Campos",
-        state: "SP",
-        country: "Brasil",
-        role: "Embedded Systems Engineer",
-        company: "Aerospace SA",
-        yearsOfExperience: 7,
-        bio: "Trabalhando na fronteira entre hardware e software.",
-        skills: ["Rust", "RTOS", "C", "Hardware Design"]
-      },
-      {
-        fullName: "Sofia Ramos",
-        email: "sofia.r@exemplo.com",
-        phone: "71911009988",
-        birthDate: new Date("2001-05-05"),
-        course: "Ciência da Computação",
-        graduationYear: 2024,
-        city: "Salvador",
-        state: "BA",
-        country: "Brasil",
-        role: "Junior Developer",
-        company: "Startup Axé",
-        yearsOfExperience: 1,
-        bio: "Recém-graduada com paixão por aprender novas tecnologias.",
-        skills: ["React Native", "Firebase", "JavaScript"]
-      },
-      {
-        fullName: "Henrique Dias",
-        email: "henrique.d@exemplo.com",
-        phone: "92900998877",
-        birthDate: new Date("1997-02-18"),
-        course: "Engenharia de Software",
-        graduationYear: 2020,
-        city: "Manaus",
-        state: "AM",
-        country: "Brasil",
-        role: "Cloud Architect",
-        company: "Amazonas Tech",
-        yearsOfExperience: 5,
-        bio: "Especialista em migração para nuvem e serverless.",
-        skills: ["AWS", "Azure", "Lambda", "DynamoDB"]
-      },
-      {
-        fullName: "Priscila Viana",
-        email: "pri.viana@exemplo.com",
-        phone: "84988771122",
-        birthDate: new Date("1999-08-30"),
-        course: "Sistemas de Informação",
-        graduationYear: 2022,
-        city: "Natal",
-        state: "RN",
-        country: "Brasil",
-        role: "SEO Specialist",
-        company: "Marketing Digital",
-        yearsOfExperience: 3,
-        bio: "Otimizando a presença digital de grandes empresas.",
-        skills: ["Google Analytics", "Next.js", "Content Strategy"]
-      },
-      {
-        fullName: "Daniel Medeiros",
-        email: "daniel.m@exemplo.com",
-        phone: "67977661100",
-        birthDate: new Date("1996-10-10"),
-        course: "Ciência da Computação",
-        graduationYear: 2019,
-        city: "Campo Grande",
-        state: "MS",
-        country: "Brasil",
-        role: "Game Developer",
-        company: "Indie Games",
-        yearsOfExperience: 6,
-        bio: "Criando experiências imersivas através de jogos.",
-        skills: ["Unity", "C#", "Blender", "Game Design"]
-      }
-    ]
-  });
+  const totalUsers = 6000;
+  const batchSize = 1000; // Lotes de 1000 para não sobrecarregar o banco
+  // Hash genérico da senha "123456" para todos
+  const defaultPasswordHash = '$2b$10$EP03m245oZpI0h/5Y4.8Z.u2oO3tA2g1mUvO.wF/L6h5lZ2z2D/Kq';
 
-  console.log('✅ Banco de dados atualizado com sucesso!');
+  for (let batch = 0; batch < totalUsers / batchSize; batch++) {
+    const usersBatch = [];
+    const alumniBatch = [];
+
+    for (let i = 0; i < batchSize; i++) {
+      const userId = faker.string.uuid();
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
+      const fullName = `${firstName} ${lastName}`;
+      // Garante um email 100% único usando o índice
+      const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${batch * batchSize + i}@alumni.teste.com`;
+
+      usersBatch.push({
+        id: userId,
+        full_name: fullName,
+        email: email,
+        password_hash: defaultPasswordHash,
+      });
+
+      alumniBatch.push({
+        id: faker.string.uuid(),
+        user_id: userId,
+        fullName: fullName,
+        email: email,
+        phone: faker.phone.number(),
+        birthDate: faker.date.birthdate({ min: 22, max: 65, mode: 'age' }),
+        country: 'Brasil',
+        state: faker.location.state(),
+        city: faker.location.city(),
+        course: faker.helpers.arrayElement(['Engenharia Cartográfica', 'Engenharia da Computação', 'Engenharia de Comunicações', 'Engenharia de Fortificação e Construção', 'Engenharia de Materiais', 'Engenharia Elétrica', 'Engenharia Eletrônica', 'Engenharia Mecânica e de Automóveis', 'Engenharia Mecânica e de Armamentos', 'Engenharia Química']),
+        graduationYear: faker.number.int({ min: 1980, max: 2024 }),
+        company: faker.company.name(),
+        role: faker.person.jobTitle(),
+        bio: faker.lorem.paragraph(),
+        skills: faker.helpers.arrayElements(['React', 'Node.js', 'Python', 'Java', 'Docker', 'PostgreSQL', 'AWS', 'TypeScript'], 3),
+        profilePicture: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`
+      });
+    }
+
+    // Salva os 1.000 usuários e os 1.000 ex-alunos ao mesmo tempo
+    await prisma.$transaction([
+      prisma.users.createMany({ data: usersBatch }),
+      prisma.alumnus.createMany({ data: alumniBatch })
+    ]);
+
+    console.log(`✅ Lote ${batch + 1} concluído: ${(batch + 1) * batchSize} usuários criados...`);
+  }
+
+  console.log('🎉 Fim! O banco de dados acaba de receber 6.000 usuários com sucesso!');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Erro durante a injeção de dados:', e);
     process.exit(1);
   })
   .finally(async () => {

@@ -168,6 +168,36 @@ ul li svg {
   text-decoration: underline;
 }
 
+.readMoreBtn {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 0.5rem;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.readMoreBtn:hover {
+  color: #0056b3;
+}
+
+.bioWrapper {
+  width: 100%;
+  max-width: 100%;
+}
+.bioWrapper .description {
+  white-space: pre-wrap;      
+  word-wrap: break-word;      
+  overflow-wrap: anywhere; 
+  word-break: break-word;
+  max-width: 100%;
+  line-height: 1.5;
+}
+
 @media (max-width: 600px) {
   .content {
     grid-template-columns: 1fr;
@@ -184,5 +214,6 @@ ul li svg {
   }
   .mainInfo{
     font-size: 15px;
+    min-width: 0;
   }
 }

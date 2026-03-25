@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header/Header';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import AlumniCard from '../../components/AlumniCard/AlumniCard';
@@ -7,54 +7,69 @@ import Footer from '../../components/Footer/Footer';
 import AddAlumniModal from '../../components/AddAlumniModal/AddAlumniModal';
 import { Search } from 'lucide-react';
 import ErrorBanner from '../../components/ErrorBanner/ErrorBanner';
-import { getAlumni, upsertMyProfile, getMyProfile } from '../../services/api';
+import { getAlumni, upsertMyProfile, getMyProfile, getFilters } from '../../services/api';
 
-// Estilos
 import styles from './Home.module.css';
-
-const PAGE_SIZE = 8;
-
-// 1. OTIMIZAÇÃO: Função movida para fora do componente
-const normalize = (str) => {
-  if (!str) return '';
-  return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-};
 
 const Home = ({ isLoggedIn, setIsLoggedIn }) => {
   const [alumni, setAlumni] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterOptions, setFilterOptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  // filtros / busca
+  // Filtros / Busca
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCurso, setSelectedCurso] = useState('');
   const [selectedAno, setSelectedAno] = useState('');
+  const [selectedArea, setSelectedArea] = useState('');
 
-  // UI
+  // Estados para as opções reais do banco
+  const [availableCourses, setAvailableCourses] = useState([]);
+  const [availableYears, setAvailableYears] = useState([]);
+  const [availableRoles, setAvailableRoles] = useState([]);
+
+  // UI e Paginação
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
 
-  // -------------------------
-  // DATA
-  // -------------------------
-  async function fetchAlumni(filters = {}) {
+  // 1. CARREGAR OPÇÕES DE FILTRO (Executa 1x ao montar)
+  useEffect(() => {
+    async function loadFilters() {
+      try {
+        const response = await getFilters();
+        // O backend deve retornar: { courses: [], years: [], roles: [] }
+        setAvailableCourses(response.data.courses || []);
+        setAvailableYears(response.data.years || []);
+        setAvailableRoles(response.data.roles || []);
+      } catch (err) {
+        console.error("Erro ao carregar filtros do banco:", err);
+      }
+    }
+    loadFilters();
+  }, []);
+
+  // 2. BUSCAR ALUNOS (Sempre que página ou filtros mudarem)
+  async function fetchAlumni(filters = {}, currentPage = 1) {
     setLoading(true);
     setErrorMessage(null);
 
     try {
-      const response = await getAlumni(filters);
-      setAlumni(response.data);
+      const response = await getAlumni({ ...filters, page: currentPage });
+      const result = response.data;
+      const dataArray = Array.isArray(result.data) ? result.data : [];
 
-      if (Object.keys(filters).length === 0) {
-        setFilterOptions(response.data);
+      setAlumni(dataArray);
+
+      if (result.meta) {
+        setTotalPages(result.meta.totalPages);
+        setTotalItems(result.meta.total);
       }
     } catch (err) {
+      setAlumni([]);
       const msg = err.response?.data?.message || 'Erro ao carregar dados.';
       setErrorMessage(msg);
     } finally {
@@ -66,16 +81,18 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
     const query = {};
     if (selectedCurso) query.course = selectedCurso;
     if (selectedAno) query.graduationYear = selectedAno;
-    fetchAlumni(query);
-  }, [selectedCurso, selectedAno]);
+    if (selectedArea) query.role = selectedArea;
+    if (searchTerm) query.fullName = searchTerm;
 
-  // verifica se usuário já tem perfil
+    fetchAlumni(query, page);
+  }, [selectedCurso, selectedAno, selectedArea, searchTerm, page]);
+
+  // Verifica perfil do usuário logado
   useEffect(() => {
     if (!isLoggedIn) {
       setHasProfile(false);
       return;
     }
-
     getMyProfile()
       .then(() => setHasProfile(true))
       .catch((err) => {
@@ -83,48 +100,6 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
       });
   }, [isLoggedIn]);
 
-  // -------------------------
-  // FILTROS
-  // -------------------------
-  const cursosUnicos = useMemo(() => {
-    return [
-      ...new Set(filterOptions.map((a) => a.course).filter(Boolean)),
-    ].sort();
-  }, [filterOptions]);
-
-  const anosUnicos = useMemo(() => {
-    return [
-      ...new Set(filterOptions.map((a) => a.graduationYear).filter(Boolean)),
-    ].sort((a, b) => b - a);
-  }, [filterOptions]);
-
-  const filteredAlumni = useMemo(() => {
-    // A função normalize agora é externa
-    const search = normalize(searchTerm);
-
-    return alumni.filter((alumnus) => {
-      const name = normalize(alumnus.fullName);
-      return name.includes(search);
-    });
-  }, [alumni, searchTerm]);
-
-  // reset de página ao mudar filtros/busca
-  useEffect(() => {
-    setPage(1);
-  }, [searchTerm, selectedCurso, selectedAno]);
-
-  // -------------------------
-  // PAGINAÇÃO
-  // -------------------------
-  const totalPages = Math.max(1, Math.ceil(filteredAlumni.length / PAGE_SIZE));
-  const pageAlumni = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return filteredAlumni.slice(start, start + PAGE_SIZE);
-  }, [filteredAlumni, page]);
-
-  // -------------------------
-  // RENDER
-  // -------------------------
   return (
     <div className={styles.wrapper}>
       <Header
@@ -133,49 +108,52 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
         onAddClick={() => setIsAddModalOpen(true)}
         addLabel={hasProfile ? 'EDITAR PERFIL' : 'ADICIONAR PERFIL'}
       />
-      {/* <div className={styles.footerDivider}></div> */}
-
 
       <main className={styles.container}>
-        <ErrorBanner
-          message={errorMessage}
-          onClose={() => setErrorMessage(null)}
-        />
+        <ErrorBanner message={errorMessage} onClose={() => setErrorMessage(null)} />
 
         <SearchBar
           searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          cursos={cursosUnicos}
+          onSearchChange={(value) => {
+            setSearchTerm(value);
+            setPage(1); // Reseta a página aqui!
+          }}
+          cursos={availableCourses}
           selectedCurso={selectedCurso}
-          onCursoChange={setSelectedCurso}
-          anos={anosUnicos}
+          onCursoChange={(value) => {
+            setSelectedCurso(value);
+            setPage(1);
+          }}
+          anos={availableYears}
           selectedAno={selectedAno}
-          onAnoChange={setSelectedAno}
+          onAnoChange={(value) => {
+            setSelectedAno(value);
+            setPage(1);
+          }}
+          areas={availableRoles}
+          selectedArea={selectedArea}
+          onAreaChange={(value) => {
+            setSelectedArea(value);
+            setPage(1);
+          }}
         />
 
         {!loading && (
           <p className={styles.resultsInfo}>
-            Mostrando <strong>{pageAlumni.length}</strong> de{' '}
-            {filteredAlumni.length} ex-alunos
+            Mostrando página <strong>{page}</strong> de {totalPages} ({totalItems} ex-alunos no total)
           </p>
         )}
 
         {loading ? (
-          <section>
-            <div className={styles.loadingGrid}>
-              {/* Ajuste: Usa o PAGE_SIZE dinamicamente */}
-              {Array.from({ length: PAGE_SIZE }).map((_, n) => (
-                <div key={n} className={styles.skeletonCard}></div>
-              ))}
-            </div>
-            <p className={styles.loadingText}>
-              Buscando ex-alunos na base de dados...
-            </p>
+          <section className={styles.loadingGrid}>
+            {Array.from({ length: 8 }).map((_, n) => (
+              <div key={n} className={styles.skeletonCard}></div>
+            ))}
           </section>
-        ) : filteredAlumni.length > 0 ? (
+        ) : alumni.length > 0 ? (
           <>
             <section className={styles.cardsGrid}>
-              {pageAlumni.map((alumnus) => (
+              {alumni.map((alumnus) => (
                 <AlumniCard
                   key={alumnus.id}
                   data={alumnus}
@@ -184,70 +162,45 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
               ))}
             </section>
 
-
             {totalPages > 1 && (
               <div className={styles.paginationWrapper}>
-                {/* Botão Anterior */}
                 <button
                   className={styles.controlPageBtn}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                >
-                  &lt; 
-                </button>
+                > &lt; </button>
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => {
-                  if ( num === 1 || num === totalPages || (num >= page - 1 && num <= page + 1) ) {
+                  if (num === 1 || num === totalPages || (num >= page - 1 && num <= page + 1)) {
                     return (
                       <button
                         key={num}
                         className={`${styles.circleBtn} ${page === num ? styles.active : ''}`}
                         onClick={() => setPage(num)}
-                      >
-                        {num}
-                      </button>
+                      > {num} </button>
                     );
                   }
-
-                  // Adiciona reticências (...) entre os saltos
                   if (num === page - 2 || num === page + 2) {
                     return <span key={num} className={styles.dots}>...</span>;
                   }
-
                   return null;
                 })}
 
-                {/* Botão Próximo */}
                 <button
                   className={styles.controlPageBtn}
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                >
-                  &gt; 
-                </button>
+                > &gt; </button>
               </div>
             )}
           </>
         ) : (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>
-              <Search size={48} color="#cc4b00" />
-            </div>
+            <Search size={48} color="#cc4b00" />
             <h2>Nenhum resultado encontrado</h2>
-            <p>
-              Não encontramos nenhum ex-aluno que corresponda aos filtros
-              selecionados.
-            </p>
-            <button
-              className={styles.clearBtn}
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedCurso('');
-                setSelectedAno('');
-              }}
-            >
-              Limpar todos os filtros
-            </button>
+            <button className={styles.clearBtn} onClick={() => {
+              setSearchTerm(''); setSelectedCurso(''); setSelectedAno(''); setSelectedArea(''); setPage(1);
+            }}> Limpar filtros </button>
           </div>
         )}
       </main>
@@ -265,20 +218,14 @@ const Home = ({ isLoggedIn, setIsLoggedIn }) => {
               await upsertMyProfile(payload);
               setHasProfile(true);
               setIsAddModalOpen(false);
-
-              const query = {};
-              if (selectedCurso) query.course = selectedCurso;
-              if (selectedAno) query.graduationYear = selectedAno;
-              await fetchAlumni(query);
+              fetchAlumni({}, 1);
             } catch (error) {
-              console.error("Erro ao salvar perfil:", error);
-              setErrorMessage("Erro ao salvar. Verifique o console.");
+              const msg = error.response?.data?.message || "Erro ao salvar perfil.";
+              setErrorMessage(msg);
             }
           }}
         />
       )}
-
-      <div className={styles.footerDivider}></div>
       <Footer />
     </div>
   );
